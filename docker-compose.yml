@@ -1,0 +1,55 @@
+version: '3.9'
+
+services:
+
+  web:
+    stdin_open: true
+    build:
+      context: ./client/
+    ports:
+      - '3000:3000'
+    volumes:
+      - /app/node_modules
+      - ./client:/usr/app
+
+  server:
+    build:
+      context: ./api/
+      target: dev
+      args:
+        - NODE_ENV=development
+        - PORT=8000
+    ports:
+      - "8000:8000"
+      - "9229:9229"
+      - "9230:9230"
+    volumes:
+      - ./api/:/usr/app
+      - ./api/package.json:/usr/app/package.json
+      - ./api/package-lock.json:/usr/app/package-lock.json
+    environment:
+      - NODE_ENV=development
+    
+    restart: 'unless-stopped'
+    depends_on:
+      mongo:
+        condition: service_healthy
+    healthcheck:
+      disable: true
+
+  mongo:
+    image: mongo:4.4
+    command: mongod --serviceExecutor adaptive
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: root-db
+    volumes:
+      - ./scripts/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js/:ro
+    healthcheck:
+      test: "[ `echo 'db.runCommand(\"ping\").ok' | mongo localhost/ --quiet` ] && echo 0 || echo 1"
+
+volumes:
+  notused:

@@ -1,0 +1,11 @@
+.git
+*Dockerfile*
+*docker-compose*
+node_modules
+npm-debug.log
+README.md
+.dockerignore
+.git
+.gitignore
+.prettierrc
+**/node_modules

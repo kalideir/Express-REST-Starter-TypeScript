@@ -1,0 +1,83 @@
+import { Router } from 'express';
+import * as controller from '../controllers/media.controller';
+import { requireAdmin, requireUser, validate } from '../middleware';
+import { createMediaSchema, deleteMediaSchema } from '../schema';
+import Multer, { memoryStorage } from 'multer';
+
+const router = Router();
+
+const storage = memoryStorage();
+
+const multer = Multer({
+  storage,
+});
+
+router.param('id', controller.load);
+
+/**
+ * @swagger
+ * /media:
+ *   post:
+ *     tags:
+ *       - Media
+ *     summary: Upload file + create media instance
+ *     consumes:
+ *       - multipart/form-data
+ *     security:
+ *       - Bearer: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               type:
+ *                 type: string
+ *               contentType:
+ *                  type: string
+ *               file:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *      200:
+ *        description: Success
+ *      409:
+ *        description: Conflict
+ *      400:
+ *        description: Bad request
+ */
+router.post('/', multer.single('file'), validate(createMediaSchema), controller.create);
+
+/**
+ * @swagger
+ * /media/{id}:
+ *   delete:
+ *     tags:
+ *       - Media
+ *     summary: Delete media
+ *     consumes:
+ *       - application/json
+ *     security:
+ *       - Bearer: []
+ *     parameters:
+ *      - name: id
+ *        in: path
+ *        required: true
+ *        schema:
+ *          type: string
+ *     responses:
+ *      200:
+ *        description: Success
+ *      409:
+ *        description: Conflict
+ *      400:
+ *        description: Bad request
+ */
+router.delete('/:id', validate(deleteMediaSchema), controller.remove);
+
+router.route('/:id').get(controller.get);
+
+router.post('/imageUpload', requireUser, multer.single('image'), controller.upload);
+
+export default router;
