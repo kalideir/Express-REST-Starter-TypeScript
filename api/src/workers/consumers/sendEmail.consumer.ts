@@ -1,12 +1,16 @@
 import { Job } from 'bull';
-// import { sendMailQueue } from '../../../config/bull';
-import { SendEmailJobData } from '../../@types';
 import { logger, sendEmail } from '../../utils';
+import { sendMailQueue } from '../bull';
 
-// sendMailQueue.process(async (job: Job<SendEmailJobData>) => {
-//   logger.debug(job.data);
-//   return await consumer(job.data);
-// });
+export type SendEmailJobData = {
+  emailOptions: any;
+  context: any;
+};
+
+sendMailQueue.process(async (job: Job<SendEmailJobData>) => {
+  logger.debug(job.data);
+  return await consumer(job.data);
+});
 
 export default function consumer(jobData: SendEmailJobData) {
   return new Promise((resolve, reject) => {

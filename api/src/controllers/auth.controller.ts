@@ -35,21 +35,7 @@ export async function register(req: Request<unknown, unknown, RegisterUserInput>
     const verificationCode = await generateVerificationCode(user.email);
     user.verificationCode = verificationCode;
     await user.save();
-    const emailOptions = {
-      to: user.email,
-      subject: 'Ditt konto har skapats framgångsrikt. Vänligen verifiera din e-postadress.',
-    };
-    const context = {
-      description: 'För att kunna logga in vänligen verifiera din e-post via denna länk:',
-      subject: 'Ditt konto har skapats framgångsrikt. Vänligen verifiera din e-postadress.',
-      action: 'Aktivera konto',
-      actionUrl: `${clientUrl}/verify-account/${user.verificationCode}`,
-      message: 'Välkommen till Ahlan Jobb',
-      btnText: 'Aktivera konto',
-    };
-    sendEmail(emailOptions, context);
-    // sendEmailProducer(emailOptions, context);
-    res.json({ message: 'Kontot har skapats. Kontrollera din inkorg för att verifiera din e-post' });
+    res.json({ message: 'Account was created successfullly' });
   } catch (e) {
     logger.error(e);
     return res.status(httpStatus.CONFLICT).send({ message: 'Kontot finns. Logga in istället.' });
@@ -85,13 +71,13 @@ export async function login(req: Request<unknown, unknown, LoginInput>, res: Res
 
     const refreshToken = await signRefreshToken({ id: user._id, email: user.email });
 
-    user = await (await (await (await user.populate('company')).populate('employee')).populate('profilePicture')).populate('resume');
+    user = await user.populate('profilePicture');
 
     return res.send({
       accessToken,
       refreshToken,
       user: user.toJSON(),
-      message: 'Inloggad framgångsrikt',
+      message: 'Login Successfull',
     });
   } catch (e) {
     logger.error(e);

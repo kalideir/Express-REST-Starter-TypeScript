@@ -1,4 +1,4 @@
-import { number, object, string, TypeOf } from 'zod';
+import { object, string, TypeOf } from 'zod';
 
 /**
  * @swagger
@@ -12,10 +12,10 @@ import { number, object, string, TypeOf } from 'zod';
  *      properties:
  *        email:
  *          type: string
- *          default: 'decoder314@gmail.com'
+ *          default: ''
  *        password:
  *          type: string
- *          default: stringPassword123
+ *          default: ''
  *    RegisterUserResponse:
  *      type: object
  *      properties:
@@ -31,11 +31,11 @@ import { number, object, string, TypeOf } from 'zod';
 export const registerUserSchema = object({
   body: object({
     password: string({
-      required_error: 'lösenord krävs',
-    }).min(6, 'Lösenordet är för kort - bör vara minst 6 teckens'),
+      required_error: 'password is required',
+    }).min(6, 'Password must be at least 6 charachters'),
     email: string({
-      required_error: 'E-post krävs',
-    }).email('Inte ett giltigt mejl'),
+      required_error: 'Email is required',
+    }).email('Not a valid Email'),
   }),
 });
 
@@ -51,7 +51,7 @@ export const registerUserSchema = object({
  *      properties:
  *        email:
  *          type: string
- *          default: 'ali.dulaimi.h@gmail.com'
+ *          default: ''
  *        password:
  *          type: string
  *          default: aqaqaq
@@ -72,11 +72,11 @@ export const registerUserSchema = object({
 export const loginSchema = object({
   body: object({
     email: string({
-      required_error: 'E-post krävs',
-    }).email('Ogiltig e-post eller lösenord'),
+      required_error: 'Email is required',
+    }).email('Not a valid Email'),
     password: string({
-      required_error: 'lösenord krävs',
-    }).min(6, 'Ogiltig e-post eller lösenord'),
+      required_error: 'Password is required',
+    }).min(6, 'Password must be at least 6 charachters'),
   }),
 });
 
@@ -132,8 +132,8 @@ export const verifyUserSchema = object({
 export const resendVerificationCodeSchema = object({
   body: object({
     email: string({
-      required_error: 'E-post krävs',
-    }).email('Inte ett giltigt mejl'),
+      required_error: 'Email is required',
+    }).email('Not a valid Email'),
   }),
 });
 
@@ -165,8 +165,8 @@ export const resendVerificationCodeSchema = object({
 export const forgotPasswordSchema = object({
   body: object({
     email: string({
-      required_error: 'E-post krävs',
-    }).email('Inte ett giltigt mejl'),
+      required_error: 'Email is required',
+    }).email('Not a valid Email'),
   }),
 });
 
@@ -204,13 +204,13 @@ export const resetPasswordSchema = object({
   }),
   body: object({
     password: string({
-      required_error: 'lösenord krävs',
-    }).min(6, 'Lösenordet är för kort - bör vara minst 6 tecken'),
+      required_error: 'Password is required',
+    }).min(6, 'Password must be at least 6 charachters'),
     passwordConfirmation: string({
-      required_error: 'Lösenordsbekräftelse krävs',
+      required_error: 'Password confirmation is required',
     }),
   }).refine(data => data.password === data.passwordConfirmation, {
-    message: 'Lösenorden matchar inte',
+    message: "Passwords dont't match",
     path: ['passwordConfirmation'],
   }),
 });
@@ -246,13 +246,13 @@ export const resetPasswordSchema = object({
 export const newPasswordSchema = object({
   body: object({
     password: string({
-      required_error: 'lösenord krävs',
-    }).min(6, 'Lösenordet är för kort - bör vara minst 6 tecken'),
+      required_error: 'Password is required',
+    }).min(6, 'Password must be at least 6 charachters'),
     passwordConfirmation: string({
-      required_error: 'Lösenordsbekräftelse krävs',
+      required_error: 'Password confirmation is required',
     }),
   }).refine(data => data.password === data.passwordConfirmation, {
-    message: 'Lösenorden matchar inte',
+    message: "Passwords don't match",
     path: ['passwordConfirmation'],
   }),
 });
@@ -276,7 +276,7 @@ export const newPasswordSchema = object({
  */
 export const tokenSchema = object({
   body: object({
-    refreshToken: string({ required_error: 'RefreshToken is required to generate new AccessToken' }),
+    refreshToken: string({ required_error: 'Refresh token is required to generate new access token' }),
   }),
 });
 

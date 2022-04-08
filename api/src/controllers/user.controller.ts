@@ -34,46 +34,6 @@ export async function get(req: Request<GetUsersInput['params']>, res: Response) 
   }
 }
 
-export async function create(req: Request<unknown, unknown, CreateUserInput['body']>, res: Response) {
-  try {
-    const owner = res.locals.user;
-    const password = passwordGenerator.generate({
-      length: 10,
-      numbers: true,
-    });
-    let payload: CreateUserPartial = { ...req.body, password };
-    if (owner.role === Role.COMPANY_MANAGER) {
-      payload = { ...payload, companyId: owner.id };
-    }
-    if (owner.role === Role.EMPLOYEE) {
-      payload = { ...payload, companyId: owner.companyId, employeeId: owner.id };
-    }
-    const user = await createUser(payload);
-    const verificationCode = await generateVerificationCode(user.email);
-    user.verificationCode = verificationCode;
-    await user.save();
-    const emailOptions = {
-      to: user.email,
-      subject: 'Ditt konto har skapats framgångsrikt. Vänligen verifiera din e-postadress.',
-    };
-    const context = {
-      description: `För att kunna logga in vänligen verifiera din e-post via denna länk. Använd \n e-post:<b> ${user.email} </b> och \n Lösenord: <b> ${password} </b> för att logga in på ditt konto efter verifiering.`,
-      subject: 'Ditt konto har skapats framgångsrikt. Vänligen verifiera din e-postadress.',
-      action: 'Aktivera konto',
-      actionUrl: `${clientUrl}/verify-account/${verificationCode}`,
-      message: 'Välkommen till AhlanJobb',
-      btnText: 'Aktivera konto',
-    };
-    if (req.body.role !== 'USER') {
-      sendEmail(emailOptions, context);
-    }
-    res.json({ message: 'Kontot har skapats.' });
-  } catch (e) {
-    logger.error(e);
-    return res.status(httpStatus.CONFLICT).send({ message: 'Kontot finns redan.' });
-  }
-}
-
 export async function update(req: Request<UpdateUserInput['body']>, res: Response) {
   try {
     const user = res.locals.user;

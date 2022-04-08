@@ -9,46 +9,17 @@ const userPayload = {
     lastName: string({
       required_error: 'Last name is required',
     }).optional(),
-    country: string({
-      required_error: 'Country is required',
-    }).optional(),
-    city: string({
-      required_error: 'City Last name is required',
-    }).optional(),
-    zip: string({
-      required_error: 'ZIP is required',
-    }).optional(),
     address: string({
       required_error: 'Address is required',
     }).optional(),
     phoneNumber: string({
       required_error: 'Phone number is required',
     }).optional(),
-    companyLicenseNumber: string({}).optional(),
-    fileNumber: number({
-      required_error: 'Last name is required',
-    }).optional(),
-    startDate: string({
-      required_error: 'Start date is required',
-    }).optional(),
-    birthdate: string({
-      required_error: 'Birthdate is required',
-    }).optional(),
     profilePictureId: string({}).nullable().optional(),
     resumeId: string({}).nullable().optional(),
     endDate: string({
       required_error: 'End date is required',
     }).optional(),
-    categories: array(
-      object({
-        id: string({
-          required_error: 'category id is required',
-        }),
-        name: string({
-          required_error: 'category name is require',
-        }),
-      }),
-    ).optional(),
   }),
 };
 
@@ -94,99 +65,6 @@ export const getUserSchema = object({
   params: object({
     id: string(),
   }),
-});
-
-/**
- * @swagger
- * components:
- *  schemas:
- *    CreateUserInput:
- *      type: object
- *      required:
- *        - email
- *        - role
- *        - companyName
- *        - fileNumber
- *        - firstName
- *        - lastName
- *        - startDate
- *        - endDate
- *        - categories
- *        - city
- *        - phoneNumber
- *      properties:
- *        role:
- *          type: string
- *          default: USER
- *        email:
- *          type: string
- *          default: decoder314@gmail.com
- *        fileNumber:
- *          type: string
- *        startDate:
- *          type: string
- *        endDate:
- *          type: string
- *    CreateUserResponse:
- *        type: object
- *        properties:
- *          email:
- *            type: string
- *          _id:
- *            type: string
- *          createdAt:
- *            type: string
- *          updatedAt:
- *            type: string
- */
-export const createUserSchema = object({
-  body: object({
-    email: string({
-      required_error: 'E-Mail is required',
-    }).email(),
-    role: string({
-      required_error: 'Role is required',
-    }),
-    companyName: string({
-      required_error: 'Company name is required',
-    }).optional(),
-    fileNumber: number({
-      required_error: 'File number is required',
-    }).optional(),
-    firstName: string({
-      required_error: 'First name is required',
-    }).optional(),
-    lastName: string({
-      required_error: 'Last name is required',
-    }).optional(),
-    city: string({
-      required_error: 'City/Region is required',
-    }).optional(),
-    companyLicenseNumber: string({}).optional(),
-    categories: array(
-      object({
-        id: string(),
-        name: string(),
-      }),
-    ).optional(),
-    startDate: string({
-      required_error: 'Start date is required',
-    }).optional(),
-    endDate: string({
-      required_error: 'End date is required',
-    }).optional(),
-  }).refine(
-    data => {
-      if (!Object.values<string>(Role).includes(data.role)) {
-        return false;
-      } else {
-        return true;
-      }
-    },
-    {
-      message: 'Not a valid user role',
-    },
-  ),
 });
 
 /**
@@ -302,20 +180,6 @@ export const listUsersSchema = object({
  * @swagger
  * components:
  *  schemas:
- *    ToggleDisableUserResponse:
- *      type: object
- *      properties:
- *        message:
- *          type: string
- */
-export const toggleUserDisableSchema = object({
-  ...params,
-});
-
-/**
- * @swagger
- * components:
- *  schemas:
  *    UpdateUserInput:
  *      type: object
  *    UpdateUserResponse:
@@ -361,10 +225,8 @@ export const deleteUserSchema = object({
   ...params,
 });
 
-export type CreateUserInput = TypeOf<typeof createUserSchema>;
 export type UpdateUserInput = Partial<TypeOf<typeof updateUserSchema>>;
 export type UpdateOtherUserInput = Partial<TypeOf<typeof updateOtherUserSchema>>;
 export type ListUsersInput = TypeOf<typeof listUsersSchema>;
 export type GetUsersInput = TypeOf<typeof getUserSchema>;
-export type ToggleUserDisableInput = TypeOf<typeof toggleUserDisableSchema>;
 export type DeleteUserInput = TypeOf<typeof deleteUserSchema>;
