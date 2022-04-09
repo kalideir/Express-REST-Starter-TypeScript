@@ -1,0 +1,48 @@
+2022-04-09 21:01:57 error: connect ECONNREFUSED 127.0.0.1:465
+2022-04-09 21:04:50 error: connect ECONNREFUSED 127.0.0.1:465
+2022-04-09 21:05:11 error: uncaughtException: ⨯ Unable to compile TypeScript:
+[96msrc/controllers/user.controller.ts[0m:[93m59[0m:[93m12[0m - [91merror[0m[90m TS2304: [0mCannot find name '_'.
+
+[7m59[0m     body = _.omit(body, ['password', 'passwordConfirmtion', 'email', 'role']);
+[7m  [0m [91m           ~[0m
+
+TSError: ⨯ Unable to compile TypeScript:
+[96msrc/controllers/user.controller.ts[0m:[93m59[0m:[93m12[0m - [91merror[0m[90m TS2304: [0mCannot find name '_'.
+
+[7m59[0m     body = _.omit(body, ['password', 'passwordConfirmtion', 'email', 'role']);
+[7m  [0m [91m           ~[0m
+
+    at createTSError (/Users/furkan/Desktop/github projects/Express-REST-Starter/api/node_modules/ts-node/src/index.ts:820:12)
+    at reportTSError (/Users/furkan/Desktop/github projects/Express-REST-Starter/api/node_modules/ts-node/src/index.ts:824:19)
+    at getOutput (/Users/furkan/Desktop/github projects/Express-REST-Starter/api/node_modules/ts-node/src/index.ts:1014:36)
+    at Object.compile (/Users/furkan/Desktop/github projects/Express-REST-Starter/api/node_modules/ts-node/src/index.ts:1322:43)
+    at Module.m._compile (/Users/furkan/Desktop/github projects/Express-REST-Starter/api/node_modules/ts-node/src/index.ts:1454:30)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1153:10)
+    at Object.require.extensions.<computed> [as .ts] (/Users/furkan/Desktop/github projects/Express-REST-Starter/api/node_modules/ts-node/src/index.ts:1458:12)
+    at Module.load (node:internal/modules/cjs/loader:981:32)
+    at Function.Module._load (node:internal/modules/cjs/loader:822:12)
+    at Module.require (node:internal/modules/cjs/loader:1005:19)
+2022-04-09 21:05:11 error: connect ECONNREFUSED 127.0.0.1:465
+2022-04-09 21:05:32 error: uncaughtException: ⨯ Unable to compile TypeScript:
+[96msrc/controllers/user.controller.ts[0m:[93m58[0m:[93m12[0m - [91merror[0m[90m TS2304: [0mCannot find name '_'.
+
+[7m58[0m     body = _.omit(body, ['password', 'passwordConfirmtion', 'email', 'role']);
+[7m  [0m [91m           ~[0m
+
+TSError: ⨯ Unable to compile TypeScript:
+[96msrc/controllers/user.controller.ts[0m:[93m58[0m:[93m12[0m - [91merror[0m[90m TS2304: [0mCannot find name '_'.
+
+[7m58[0m     body = _.omit(body, ['password', 'passwordConfirmtion', 'email', 'role']);
+[7m  [0m [91m           ~[0m
+
+    at createTSError (/Users/furkan/Desktop/github projects/Express-REST-Starter/api/node_modules/ts-node/src/index.ts:820:12)
+    at reportTSError (/Users/furkan/Desktop/github projects/Express-REST-Starter/api/node_modules/ts-node/src/index.ts:824:19)
+    at getOutput (/Users/furkan/Desktop/github projects/Express-REST-Starter/api/node_modules/ts-node/src/index.ts:1014:36)
+    at Object.compile (/Users/furkan/Desktop/github projects/Express-REST-Starter/api/node_modules/ts-node/src/index.ts:1322:43)
+    at Module.m._compile (/Users/furkan/Desktop/github projects/Express-REST-Starter/api/node_modules/ts-node/src/index.ts:1454:30)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1153:10)
+    at Object.require.extensions.<computed> [as .ts] (/Users/furkan/Desktop/github projects/Express-REST-Starter/api/node_modules/ts-node/src/index.ts:1458:12)
+    at Module.load (node:internal/modules/cjs/loader:981:32)
+    at Function.Module._load (node:internal/modules/cjs/loader:822:12)
+    at Module.require (node:internal/modules/cjs/loader:1005:19)
+2022-04-09 21:05:32 error: connect ECONNREFUSED 127.0.0.1:465

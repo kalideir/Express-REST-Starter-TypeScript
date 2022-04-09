@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { AccessTokenJWTPayload } from '../@types';
-import { findUserById } from '../services';
+import { AccessTokenJWTPayload, findUserById } from '../services';
 import { logger, verifyJwt } from '../utils';
 
 const deserializeUser = async (req: Request, res: Response, next: NextFunction) => {

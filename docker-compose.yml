@@ -2,20 +2,18 @@ version: '3.9'
 
 services:
 
-  web:
-    stdin_open: true
-    build:
-      context: ./client/
+  redis:
+    image: redis:6.2.6-alpine
+    restart: always
     ports:
-      - '3000:3000'
-    volumes:
-      - /app/node_modules
-      - ./client:/usr/app
+      - '6379:6379'
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
 
   server:
     build:
       context: ./api/
-      target: dev
+      target: prod
       args:
         - NODE_ENV=development
         - PORT=8000
@@ -29,11 +27,19 @@ services:
       - ./api/package-lock.json:/usr/app/package-lock.json
     environment:
       - NODE_ENV=development
+      - USERNAME=${MONGO_USERNAME}
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
+      - MONGO_HOSTNAME=mongo
+      - MONGO_PORT=27017
+      - MONGO_DATABASE_NAME=${MONGO_DATABASE_NAME}
     
     restart: 'unless-stopped'
     depends_on:
       mongo:
         condition: service_healthy
+      redis:
+        condition: service_healthy
+      
     healthcheck:
       disable: true
 
@@ -43,11 +49,11 @@ services:
     ports:
       - 27017:27017
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: password
-      MONGO_INITDB_DATABASE: root-db
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE_NAME}
     volumes:
-      - ./scripts/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js/:ro
+      - ./scripts/mongo-init.sh:/docker-entrypoint-initdb.d/mongo-init.sh/:ro
     healthcheck:
       test: "[ `echo 'db.runCommand(\"ping\").ok' | mongo localhost/ --quiet` ] && echo 0 || echo 1"
 

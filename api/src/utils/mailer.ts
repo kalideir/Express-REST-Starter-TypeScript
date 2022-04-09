@@ -2,7 +2,15 @@ import nodemailer, { SendMailOptions } from 'nodemailer';
 import config from 'config';
 import { logger } from '.';
 import hbs from 'nodemailer-express-handlebars';
-import { SendEmailContext } from '../@types';
+
+export type SendEmailContext = {
+  description: string;
+  actionUrl: string;
+  btnText: string;
+  action: string;
+  subject: string;
+  message: string;
+};
 
 const smtp = config.get<{
   user: string;
@@ -53,7 +61,7 @@ async function sendEmail(options: SendMailOptions, context: SendEmailContext) {
   };
   transporter.sendMail(payload, (err, info) => {
     if (err) {
-      logger.error(err, 'Error sending email');
+      logger.error(err);
       return;
     }
 

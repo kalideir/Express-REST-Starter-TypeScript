@@ -1,5 +1,3 @@
-# if you're doing anything beyond your local machine, please pin this to a specific version at https://hub.docker.com/_/node/
-# FROM node:8-alpine also works here for a smaller image
 FROM node:16.14-slim as prod
 
 # set our node environment, either development or production
@@ -7,7 +5,6 @@ FROM node:16.14-slim as prod
 ARG NODE_ENV=production
 ENV NODE_ENV $NODE_ENV
 
-# default to port 3000 for node, and 9229 and 9230 (tests) for debug
 ARG PORT=8000
 ENV PORT $PORT
 EXPOSE $PORT 9229 9230
@@ -17,8 +14,6 @@ RUN npm i npm@latest -g
 RUN mkdir /usr/app
 WORKDIR /usr/app
 
-
-COPY tsconfig.json ./
 COPY package*.json ./
 
 RUN npm i --unsafe-perm=true  --no-optional && npm cache clean --force

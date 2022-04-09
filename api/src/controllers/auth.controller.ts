@@ -21,15 +21,11 @@ import {
   signAccessToken,
   signRefreshToken,
 } from '../services';
-import { logger, sendEmail } from '../utils';
-import { sendEmailProducer } from '../workers';
+import { logger } from '../utils';
 
 import config from 'config';
 
-const baseUrl = config.get<string>('baseUrl');
-const clientUrl = config.get<string>('clientUrl');
-
-export async function register(req: Request<unknown, unknown, RegisterUserInput>, res: Response) {
+export async function register(req: Request<RegisterUserInput>, res: Response) {
   try {
     const user = await registerUser(req.body);
     const verificationCode = await generateVerificationCode(user.email);
@@ -136,22 +132,6 @@ export async function resendVerificationCode(req: Request<unknown, unknown, Rese
 
   await user.save();
 
-  const emailOptions = {
-    to: email,
-    subject: 'Här är länken för att verifiera din e-post',
-  };
-  const context = {
-    description: 'Klicka på länken nedan för att aktivera ditt konto.',
-    subject: 'Verifieringslänk',
-    action: 'Verifiera konto',
-    actionUrl: `${clientUrl}/verify-account/${verificationCode}`,
-    message: '',
-    btnText: 'Verifiera konto',
-  };
-
-  sendEmail(emailOptions, context);
-  // sendEmailProducer(emailOptions, context);
-
   logger.debug(`Kontoaktiveringse-post skickades till ${email}`);
 
   return res.send({ message });
@@ -178,21 +158,6 @@ export async function forgotPassword(req: Request<unknown, unknown, ForgotPasswo
   user.passwordResetCode = passwordResetCode;
 
   await user.save();
-
-  const emailOptions = {
-    to: email,
-    subject: 'Här är länken för att ändra ditt lösenord',
-  };
-  const context = {
-    description: 'Klicka på länken nedan för att ändra ditt lösenord.',
-    subject: 'nytt lösenord',
-    action: 'Skicka nytt lösenord',
-    actionUrl: `${clientUrl}/reset-password/${passwordResetCode}`,
-    message: '',
-    btnText: 'nytt lösenord',
-  };
-
-  sendEmail(emailOptions, context);
 
   logger.debug(`E-postmeddelande om lösenordsåterställning har skickats till ${email}`);
 

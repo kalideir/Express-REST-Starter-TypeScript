@@ -1,9 +1,18 @@
 import { signJwt } from '../utils/jwt';
 import { UserDocument, UserModel } from '../models';
-import { AccessTokenJWTPayload, RefreshTokenJWTPayload } from '../@types';
 import { get } from 'lodash';
 import { findUserById } from '.';
 import { verifyJwt } from '../utils';
+
+export type AccessTokenJWTPayload = {
+  id: string;
+  email: string;
+};
+
+export type RefreshTokenJWTPayload = {
+  id: string;
+  email: string;
+};
 
 export async function registerUser(input: Partial<UserDocument>) {
   try {

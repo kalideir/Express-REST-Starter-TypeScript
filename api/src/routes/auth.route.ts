@@ -1,8 +1,7 @@
 import { Router } from 'express';
 import * as controller from '../controllers/auth.controller';
-import { deserializeUser, requireUser, validate } from '../middleware';
+import { requireUser, validate } from '../middleware';
 import {
-  createUserSchema,
   forgotPasswordSchema,
   loginSchema,
   newPasswordSchema,

@@ -1,26 +1,19 @@
 export default {
-  port: 1337,
-  host: 'localhost',
+  port: process.env.PORT,
   baseUrl: process.env.BASE_URL || 'http://localhost:1337',
-  clientUrl: process.env.CLIENT_URL || 'http://localhost:3000',
-  dbURI: process.env.DB_URI,
+  dbURI: process.env.DB_URI || 'mongodb://localhost:27017',
   redisUrl: process.env.REDIS_URL || 'redis://127.0.0.1:6379',
-  smtp: {
-    user: 'Ahlanjobb@gmail.com',
-    //user: 'info@ahlanjobb.se',
-    //pass: 'mrGxp28l',
-    pass: 'omar1958y',
-    host: 'smtp.gmail.com',
-    // host: 'mail.ahlanjobb.se',
-    // 465
-    port: 465,
-    //secure: true,
+  logDir: '../logs',
+  email: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+    host: process.env.EMAIL_HOST,
+    port: process.env.EMAIL_PORT,
+    secure: process.env.EMAIL_IS_SECURE,
   },
   saltWorkFactor: 100,
-  secret: process.env.JWT_SECRET || 'local-secret',
-  awsAccessId: process.env.AWS_ACCESS_ID || 'AKIAVOWBZWLYU3F5WCX6',
-  awsSecretKey: process.env.AWS_SECRET_KEY || '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',
-  awsS3BucketName: process.env.AWS_S3_BUCKET_NAME || 'we-skillz-api',
+  secret: process.env.JWT_SECRET,
+  awsAccessId: process.env.AWS_ACCESS_ID || '',
+  awsSecretKey: process.env.AWS_SECRET_KEY || '',
+  awsS3BucketName: process.env.AWS_S3_BUCKET_NAME || '',
 };
-
-// console.log(process.env);

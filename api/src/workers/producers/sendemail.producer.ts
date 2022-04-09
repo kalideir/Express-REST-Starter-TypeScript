@@ -1,5 +1,5 @@
-import { SendEmailContext } from '../../@types';
 import { SendMailOptions } from 'nodemailer';
+import { SendEmailContext } from '../../utils/mailer';
 // import { sendMailQueue } from '../../../config/bull';
 
 export default function (emailOptions: SendMailOptions, context: SendEmailContext) {

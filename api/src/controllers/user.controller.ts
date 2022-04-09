@@ -1,18 +1,8 @@
 import { Request, Response } from 'express';
 import httpStatus from 'http-status';
-import _ from 'lodash';
-import { CreateUserPartial, ListUsersQueryType } from '../@types';
 import { Role, UserDocument, UserModel } from '../models';
-import {
-  CreateUserInput,
-  DeleteUserInput,
-  GetUsersInput,
-  ListUsersInput,
-  ToggleUserDisableInput,
-  UpdateOtherUserInput,
-  UpdateUserInput,
-} from '../schema';
-import { createUser, findUserById, generateVerificationCode, toggleDisableById, updateUser } from '../services';
+import { DeleteUserInput, GetUsersInput, ListUsersInput, UpdateOtherUserInput, UpdateUserInput } from '../schema';
+import { createUser, findUserById, generateVerificationCode, updateUser } from '../services';
 import passwordGenerator from 'generate-password';
 
 import { logger, sendEmail } from '../utils';
@@ -20,7 +10,16 @@ import { sendEmailProducer } from '../workers';
 
 import config from 'config';
 
-const clientUrl = config.get<string>('clientUrl');
+export type ListUsersQueryType = Partial<{
+  companyId: string;
+  employeeId: string;
+  verified: boolean;
+  role: string;
+  limit: string;
+  page: string;
+  search: string;
+  [name: string]: unknown;
+}>;
 
 export async function get(req: Request<GetUsersInput['params']>, res: Response) {
   try {
@@ -37,17 +36,16 @@ export async function get(req: Request<GetUsersInput['params']>, res: Response) 
 export async function update(req: Request<UpdateUserInput['body']>, res: Response) {
   try {
     const user = res.locals.user;
-    let body = req.body;
+    const body = req.body;
     // logger.info(user);
     logger.info({ cats: user.categories });
     // logger.info(body);
-    body = _.omit(body, ['password', 'passwordConfirmtion', 'email', 'role']);
+    // body = _.omit(body, ['password', 'passwordConfirmtion', 'email', 'role']);
     let newUser = await updateUser(user.id, body);
 
-    newUser = await (await (await (await newUser.populate('company')).populate('employee')).populate('profilePicture')).populate('resume');
+    newUser = await newUser.populate('profilePicture');
     return res.send({ user: newUser.toJSON(), message: 'Användarinformationen har uppdaterats' });
   } catch (e) {
-    console.log(e);
     return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({ message: 'Något gick fel' });
   }
 }
@@ -156,23 +154,5 @@ export async function listUsers(req: Request<ListUsersInput['query']>, res: Resp
   } catch (e) {
     logger.error(e);
     return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({ message: 'Något gick fel.' });
-  }
-}
-
-export async function toggleDisable(req: Request<ToggleUserDisableInput['params']>, res: Response) {
-  // function to disable either employees or companies
-  try {
-    const user = res.locals.user;
-    const { id } = req.params;
-    console.log(user, 'X');
-    if (user.role === Role.ADMIN || user.role === Role.COMPANY_MANAGER) {
-      await toggleDisableById(id);
-      return res.send({ message: 'Användaren har inaktiverats' });
-    } else {
-      return res.sendStatus(httpStatus.UNAUTHORIZED);
-    }
-  } catch (err) {
-    res.status(httpStatus.INTERNAL_SERVER_ERROR).send({ message: 'Något gick fel' });
-    logger.error(err);
   }
 }
