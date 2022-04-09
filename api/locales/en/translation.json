@@ -1,6 +1,6 @@
 {
     "account_create_success": "Account is created",
-    "account_already_exists": "Accoun already exists",
+    "account_already_exists": "Account already exists",
     "account_not_found": "Account not found",
     "login_invalid": "Login is invalid",
     "account_not_verified": "Please verify your account",
@@ -24,5 +24,7 @@
     "invalid_id_exception": "Invalid Identifier",
     "validation_exception": "Invalid Request Body",
     "email_invalid": "Must be a valid e-mail address",
-    "email_in_use": "Email in use"
+    "email_in_use": "Email in use",
+    "media_type_required": "A video or image is required",
+    "id_required": "*id* is required"
   }

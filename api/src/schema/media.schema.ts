@@ -1,12 +1,10 @@
 import { object, string, TypeOf } from 'zod';
+import { t } from '../utils';
 
 const payload = {
   body: object({
     type: string({
-      required_error: 'A video or image is required',
-    }),
-    contentType: string({
-      required_error: 'Content type is required',
+      required_error: t('media_type_required'),
     }),
   }),
 };
@@ -14,7 +12,7 @@ const payload = {
 const params = {
   params: object({
     id: string({
-      required_error: 'media *id* is required',
+      required_error: t('id_required'),
     }),
   }),
 };

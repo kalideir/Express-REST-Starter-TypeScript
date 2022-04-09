@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon",
+    "dev:production": "cross-env NODE_ENV=production nodemon",
     "build": "tsc",
     "lint": "eslint --cache \"src/**/*.{js,jsx,ts,tsx}\"",
     "lint:fix": "eslint --cache --fix \"src/**/*.{js,jsx,ts,tsx}\"",
@@ -90,7 +91,7 @@
     "tsconfig-paths": "^3.12.0"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx,md,html,hbs}": [
+    "*.{js,jsx,ts,tsx,md,html}": [
       "eslint --fix",
       "prettier --write",
       "git add ."

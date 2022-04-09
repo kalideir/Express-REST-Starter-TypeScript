@@ -53,9 +53,9 @@ export async function remove(req: Request<DeleteMediaInput['params']>, res: Resp
     const { media } = res.locals;
     await deleteFileFromAWSS3(media.originalUrl);
     await media.remove();
-    return res.status(httpStatus.OK).send({ message: 'Media har raderats.' });
+    return res.status(httpStatus.OK).send({ message: t('delete_success') });
   } catch (error) {
-    return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({ message: 'Något gick fel' });
+    return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({ message: t('something_went_wrong') });
   }
 }
 
@@ -67,9 +67,9 @@ export async function upload(req: Request, res: Response, next: NextFunction) {
     let image: unknown;
     if (uploadType === 'PROFILE-PICTURE') {
       const buffer = await sharp(req.file.buffer).resize(200, 200).toBuffer();
-      image = await uploadFileToAWSS3(`small/${filename}`, fileType, buffer);
+      image = await uploadFileToAWSS3(`/${filename}`, fileType, buffer);
     } else {
-      image = await uploadFileToAWSS3(`ahlanjobs/${filename}`, fileType, req.file.buffer);
+      image = await uploadFileToAWSS3(`/${filename}`, fileType, req.file.buffer);
     }
     res.send(image);
   } catch (error) {

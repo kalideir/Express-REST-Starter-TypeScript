@@ -1,5 +1,5 @@
-import { number, object, string, TypeOf, literal, array, date } from 'zod';
-import { Role } from '../models';
+import { object, string, TypeOf } from 'zod';
+import { t } from '../utils';
 
 const userPayload = {
   body: object({
@@ -40,21 +40,11 @@ const userPayload = {
  *          type: string
  *        updatedAt:
  *          type: string
- *        categories:
- *          type: string
  *        phoneNumber:
- *          type: string
- *        country:
- *          type: string
- *        city:
- *          type: string
- *        zip:
  *          type: string
  *        address:
  *          type: string
  *        birthdate:
- *          type: string
- *        companyName:
  *          type: string
  *        profilePicture:
  *          type: string
@@ -88,20 +78,6 @@ export const getUserSchema = object({
  *            type: string
  *          phoneNumber:
  *            type: string
- *          endDate:
- *            type: string
- *          startDate:
- *            type: string
- *          fileNumber:
- *            type: number
- *          country:
- *            type: string
- *          city:
- *            type: string
- *          zip:
- *            type: string
- *          categories:
- *            type: array
  *          profilePicture:
  *            type: string
  *          id:
@@ -114,7 +90,7 @@ export const updateUserSchema = object({
 const params = {
   params: object({
     id: string({
-      required_error: 'id is required',
+      required_error: t('id_required'),
     }),
   }),
 };
@@ -123,14 +99,8 @@ const query = {
   query: object({
     role: string({}).optional(),
     page: string({}).optional(),
-    companyId: string({}).optional(),
-    employeeId: string({}).optional(),
     limit: string({}).optional(),
     search: string({}).optional(),
-    city: string({}).optional(),
-    category: string({}).optional(),
-    startDate: string({}).optional(),
-    endDate: string({}).optional(),
   }),
 };
 
@@ -151,21 +121,11 @@ const query = {
  *          type: string
  *        updatedAt:
  *          type: string
- *        categories:
- *          type: array
  *        phoneNumber:
- *          type: string
- *        country:
- *          type: string
- *        city:
- *          type: string
- *        zip:
  *          type: string
  *        address:
  *          type: string
  *        birthdate:
- *          type: string
- *        companyName:
  *          type: string
  *        profilePicture:
  *          type: string
@@ -197,20 +157,6 @@ export const listUsersSchema = object({
  *            type: string
  *          phoneNumber:
  *            type: string
- *          endDate:
- *            type: string
- *          startDate:
- *            type: string
- *          fileNumber:
- *            type: number
- *          country:
- *            type: string
- *          city:
- *            type: string
- *          zip:
- *            type: string
- *          categories:
- *            type: array
  *          profilePicture:
  *            type: string
  *          id:
@@ -218,7 +164,7 @@ export const listUsersSchema = object({
  */
 export const updateOtherUserSchema = object({
   ...userPayload,
-  params: object({ id: string({ required_error: 'user id is required' }) }),
+  params: object({ id: string({ required_error: t('id_required') }) }),
 });
 
 export const deleteUserSchema = object({

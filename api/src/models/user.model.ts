@@ -11,8 +11,7 @@ export interface UserInput {
 
 export enum Role {
   ADMIN = 'ADMIN',
-  COMPANY_MANAGER = 'COMPANY_MANAGER',
-  EMPLOYEE = 'EMPLOYEE',
+  STAFF = 'STAFF',
   USER = 'USER',
 }
 
@@ -52,18 +51,11 @@ const userSchema = new mongoose.Schema(
       minlength: 6,
       maxlength: 128,
     },
-    fileNumber: {
-      type: Number,
-    },
     firstName: {
       type: String,
     },
     lastName: {
       type: String,
-    },
-    employeeId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
     },
     address: {
       type: String,
@@ -85,9 +77,6 @@ const userSchema = new mongoose.Schema(
     },
     birthdate: {
       type: Date,
-    },
-    companyName: {
-      type: String,
     },
     profilePictureId: {
       type: mongoose.Schema.Types.ObjectId,

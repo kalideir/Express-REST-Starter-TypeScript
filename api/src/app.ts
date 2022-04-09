@@ -7,7 +7,7 @@ import helmet from 'helmet';
 import i18n from 'i18next';
 import i18nBackend from 'i18next-fs-backend';
 import i18nMiddleware from 'i18next-http-middleware';
-import listRoutes from 'express-list-routes';
+// import listRoutes from 'express-list-routes';
 
 i18n
   .use(i18nBackend)
@@ -44,6 +44,6 @@ app.use(i18nMiddleware.handle(i18n));
 
 app.use('/api/', routes);
 
-listRoutes(routes, { prefix: '/api/' });
+// listRoutes(routes, { prefix: '/api/' });
 
 export default app;

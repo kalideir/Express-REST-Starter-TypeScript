@@ -5,7 +5,7 @@ import httpStatus from 'http-status';
 const requireStaff = (req: Request, res: Response, next: NextFunction) => {
   const user = res.locals.user;
 
-  const ALLOWED_USERS = [Role.ADMIN, Role.COMPANY_MANAGER, Role.EMPLOYEE];
+  const ALLOWED_USERS = [Role.ADMIN, Role.STAFF];
 
   if (!user) {
     return res.sendStatus(httpStatus.UNAUTHORIZED);

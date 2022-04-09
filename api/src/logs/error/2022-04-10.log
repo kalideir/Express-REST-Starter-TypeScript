@@ -9,3 +9,19 @@ TypeError: Cannot read properties of undefined (reading 'routes')
     at processTicksAndRejections (node:internal/process/task_queues:96:5)
 2022-04-10 00:49:52 error: connect ECONNREFUSED 127.0.0.1:587
 2022-04-10 00:51:09 error: connect ECONNREFUSED 127.0.0.1:587
+2022-04-10 00:55:22 error: connect ECONNREFUSED 127.0.0.1:587
+2022-04-10 00:55:45 error: Configuration property "secret" is not defined
+2022-04-10 00:57:56 error: connect ECONNREFUSED 127.0.0.1:587
+2022-04-10 01:37:35 error: connect ECONNREFUSED 127.0.0.1:587
+2022-04-10 01:39:56 error: connect ECONNREFUSED 127.0.0.1:587
+2022-04-10 01:40:07 error: connect ECONNREFUSED 127.0.0.1:587
+2022-04-10 01:46:22 error: connect ECONNREFUSED 127.0.0.1:587
+2022-04-10 01:47:28 error: connect ECONNREFUSED 127.0.0.1:587
+2022-04-10 01:47:56 error: connect ECONNREFUSED 127.0.0.1:587
+2022-04-10 01:48:21 error: connect ECONNREFUSED 127.0.0.1:587
+2022-04-10 01:48:41 error: connect ECONNREFUSED 127.0.0.1:587
+2022-04-10 01:49:54 error: connect ECONNREFUSED 127.0.0.1:587
+2022-04-10 01:51:48 error: connect ECONNREFUSED 127.0.0.1:587
+2022-04-10 01:52:22 error: connect ECONNREFUSED 127.0.0.1:587
+2022-04-10 01:53:51 error: connect ECONNREFUSED 127.0.0.1:587
+2022-04-10 01:54:24 error: connect ECONNREFUSED 127.0.0.1:587

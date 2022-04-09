@@ -4,7 +4,6 @@ import { AnyZodObject } from 'zod';
 import { logger } from '../utils';
 
 const validate = (schema: AnyZodObject) => (req: Request, res: Response, next: NextFunction) => {
-  // logger.debug({ body: req.body });
   try {
     schema.parse({
       body: req.body,
