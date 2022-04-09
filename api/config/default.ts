@@ -1,6 +1,5 @@
 export default {
-  port: process.env.PORT,
-  baseUrl: process.env.BASE_URL || 'http://localhost:1337',
+  port: process.env.PORT || 8000,
   dbURI: process.env.DB_URI || 'mongodb://localhost:27017',
   redisUrl: process.env.REDIS_URL || 'redis://127.0.0.1:6379',
   logDir: '../logs',

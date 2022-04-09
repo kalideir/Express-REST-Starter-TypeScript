@@ -1,8 +1,5 @@
 import swaggerJsdoc from 'swagger-jsdoc';
 import { version } from '../../package.json';
-import config from 'config';
-
-const baseUrl = config.get('baseUrl');
 
 const swaggerOptions: swaggerJsdoc.Options = {
   explorer: true,
@@ -10,7 +7,7 @@ const swaggerOptions: swaggerJsdoc.Options = {
     openapi: '3.0.1',
     servers: [
       {
-        url: `${baseUrl}/api/`,
+        url: `/api/`,
       },
     ],
     info: {

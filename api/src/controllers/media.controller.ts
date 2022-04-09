@@ -1,18 +1,16 @@
 import { NextFunction, Request, Response } from 'express';
 import httpStatus from 'http-status';
-import _, { omit } from 'lodash';
 import sharp from 'sharp';
 import { MediaModel } from '../models';
 import { CreateMediaInput, DeleteMediaInput, LoadMediaInput } from '../schema';
 import { deleteFileFromAWSS3, uploadFileToAWSS3 } from '../services';
-import { logger } from '../utils';
+import { logger, t } from '../utils';
 import { S3 } from 'aws-sdk';
 
 export async function load(req: Request<LoadMediaInput['params']>, res: Response, next: NextFunction) {
   try {
     const { id } = req.params;
     const media = await MediaModel.findById(id);
-    console.log(media, id, 15);
     res.locals.media = media;
     return next();
   } catch (error) {
@@ -28,13 +26,12 @@ export async function create(req: Request<CreateMediaInput>, res: Response, next
   try {
     const filename = `${Math.floor(Math.random() * 999)}_${Date.now()}_${req.file.originalname.split(' ').join('_')}`;
     const fileType = req.file.mimetype;
-    const image: S3.ManagedUpload.SendData = await uploadFileToAWSS3(`ahlanjobs/${filename}`, fileType, req.file.buffer);
-    let payload = _.omit(req.body, 'file');
-    payload = { ...payload, originalUrl: image.Location };
+    const image: S3.ManagedUpload.SendData = await uploadFileToAWSS3(`${filename}`, fileType, req.file.buffer);
+    const payload = { ...req.body, originalUrl: image.Location };
     const savedMedia = await MediaModel.create(payload);
     logger.info(savedMedia.toJSON());
     logger.info(image);
-    res.status(httpStatus.CREATED).json({ message: 'Media skapades framgångsrikt.', media: { ...savedMedia.toJSON() } });
+    res.status(httpStatus.CREATED).json({ message: t('file_upload_success'), media: { ...savedMedia.toJSON() } });
   } catch (error) {
     next(error);
   }
@@ -42,40 +39,10 @@ export async function create(req: Request<CreateMediaInput>, res: Response, next
 
 export async function update(req: Request, res: Response, next: NextFunction) {
   try {
-    const updatedMedia = omit(req.body, ['deletedAt']);
-    const media = Object.assign(res.locals.media, updatedMedia);
+    const media = Object.assign(res.locals.media, req.body);
     const savedMedia = await media.save();
     res.status(httpStatus.OK);
     res.json(savedMedia);
-  } catch (error) {
-    next(error);
-  }
-}
-
-export async function list(req: Request, res: Response, next: NextFunction) {
-  try {
-    // const query = { deletedAt: { $lte: new Date() } };
-    // const totalNotFiltered = await MediaModel.estimatedDocumentCount(query);
-    // // set query params
-    // let mediasCount = 0;
-    // const limit = parseInt(req.query.limit, 10) || 0;
-    // const page = parseInt(req.query.page, 10) || 1;
-    // let orderBy = req.query.order || 'createdAt';
-    // let perPage = 0;
-    // let offset = 0;
-    // if (req.query.orderDirection === 'desc') {
-    //   orderBy = `-${orderBy}`;
-    // }
-    // if (limit > 0) {
-    //   perPage = limit;
-    //   offset = perPage * (page - 1);
-    //   mediasCount = await MediaModel.countDocuments(query);
-    // }
-    // const medias = await MediaModel.find(query).sort(orderBy).limit(perPage).skip(offset);
-    // if (mediasCount === 0) {
-    //   mediasCount = medias.length;
-    // }
-    res.json({ results: [] });
   } catch (error) {
     next(error);
   }

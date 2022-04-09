@@ -226,7 +226,6 @@ export const deleteUserSchema = object({
 });
 
 export type UpdateUserInput = Partial<TypeOf<typeof updateUserSchema>>;
-export type UpdateOtherUserInput = Partial<TypeOf<typeof updateOtherUserSchema>>;
 export type ListUsersInput = TypeOf<typeof listUsersSchema>;
 export type GetUsersInput = TypeOf<typeof getUserSchema>;
 export type DeleteUserInput = TypeOf<typeof deleteUserSchema>;

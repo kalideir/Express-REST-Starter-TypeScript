@@ -18,26 +18,14 @@ export enum Role {
 
 export interface UserDocument extends UserInput, mongoose.Document {
   phoneNumber: string;
-  country: string;
-  city: string;
-  zip: string;
   address: string;
   passwordResetCode: string;
   verificationCode: string;
   verified: boolean;
-  disabled: boolean;
+  active: boolean;
   birthdate: Date;
-  fileNumber: number;
-  startDate: Date;
-  endDate: Date;
-  companyName: string;
-  companyLicenseNumber: string;
-  categories: Array<{ id: string; name: string }>;
   profilePictureId: string;
   role: Role;
-  companyId: string;
-  employeeId: string;
-  deletedAt: Date;
   createdAt: Date;
   updatedAt: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
@@ -77,25 +65,6 @@ const userSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     },
-    companyId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-    },
-    country: {
-      type: String,
-      maxlength: 128,
-      trim: true,
-    },
-    city: {
-      type: String,
-      maxlength: 128,
-      trim: true,
-    },
-    zip: {
-      type: String,
-      maxlength: 5,
-      trim: true,
-    },
     address: {
       type: String,
       trim: true,
@@ -110,21 +79,9 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    disabled: {
+    active: {
       type: Boolean,
-      default: false,
-    },
-    companyLicenseNumber: {
-      type: String,
-    },
-    startDate: {
-      type: Date,
-    },
-    endDate: {
-      type: Date,
-    },
-    deletedAt: {
-      type: Date,
+      default: true,
     },
     birthdate: {
       type: Date,
@@ -132,19 +89,7 @@ const userSchema = new mongoose.Schema(
     companyName: {
       type: String,
     },
-    categories: {
-      type: [
-        {
-          id: String,
-          name: String,
-        },
-      ],
-    },
     profilePictureId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Media',
-    },
-    resumeId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Media',
     },
@@ -171,30 +116,9 @@ userSchema.virtual('fullName').get(function () {
   return (this.firstName || '') + ' ' + (this.lastName || '');
 });
 
-userSchema.virtual('employee', {
-  ref: 'User',
-  localField: 'employeeId',
-  foreignField: '_id',
-  justOne: true,
-});
-
-userSchema.virtual('company', {
-  ref: 'User',
-  localField: 'companyId',
-  foreignField: '_id',
-  justOne: true,
-});
-
 userSchema.virtual('profilePicture', {
   ref: 'Media',
   localField: 'profilePictureId',
-  foreignField: '_id',
-  justOne: true,
-});
-
-userSchema.virtual('resume', {
-  ref: 'Media',
-  localField: 'resumeId',
   foreignField: '_id',
   justOne: true,
 });
@@ -220,7 +144,7 @@ userSchema.pre('save', async function (next) {
 userSchema.methods.comparePassword = async function (candidatePassword: string): Promise<boolean> {
   const user = this as UserDocument;
 
-  return bcrypt.compare(candidatePassword, user.password).catch(e => false);
+  return bcrypt.compare(candidatePassword, user.password).catch(() => false);
 };
 
 const UserModel = mongoose.model<UserDocument>('User', userSchema);

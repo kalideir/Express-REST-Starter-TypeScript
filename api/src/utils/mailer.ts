@@ -18,7 +18,7 @@ const smtp = config.get<{
   host: string;
   port: number;
   secure: boolean;
-}>('smtp');
+}>('email');
 
 const transporter = nodemailer.createTransport({
   ...smtp,

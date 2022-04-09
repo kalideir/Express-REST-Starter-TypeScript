@@ -1,17 +1,11 @@
 import mongoose from 'mongoose';
 
-export enum MediaType {
-  IMAGE = 'IMAGE',
-  VIDEO = 'VIDEO',
-}
-
-export interface MediaInput {
-  type: MediaType;
-  contentType: string;
-}
-
-export interface MediaDocument extends MediaInput, mongoose.Document {
+export interface MediaDocument extends mongoose.Document {
+  type: string;
   originalUrl: string;
+  thumbnaillUrl: string;
+  mediumUrl: string;
+  largelUrl: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -20,12 +14,17 @@ const mediaSchema = new mongoose.Schema(
   {
     type: {
       type: String,
-      enum: MediaType,
-    },
-    contentType: {
-      type: String,
     },
     originalUrl: {
+      type: String,
+    },
+    thumbnailUrl: {
+      type: String,
+    },
+    mediumUrl: {
+      type: String,
+    },
+    largeUrl: {
       type: String,
     },
   },

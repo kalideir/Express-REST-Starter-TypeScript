@@ -1,0 +1,8 @@
+2022-04-10 00:49:52 info: Swagger docs available at /api/docs
+2022-04-10 00:49:52 info: Database connected
+2022-04-10 00:49:52 info: App started at http://localhost:8000
+2022-04-10 00:49:52 error: connect ECONNREFUSED 127.0.0.1:587
+2022-04-10 00:51:09 info: Swagger docs available at /api/docs
+2022-04-10 00:51:09 info: Database connected
+2022-04-10 00:51:09 info: App started at http://localhost:8000
+2022-04-10 00:51:09 error: connect ECONNREFUSED 127.0.0.1:587

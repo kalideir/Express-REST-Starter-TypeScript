@@ -21,9 +21,7 @@ import {
   signAccessToken,
   signRefreshToken,
 } from '../services';
-import { logger } from '../utils';
-
-import config from 'config';
+import { logger, t } from '../utils';
 
 export async function register(req: Request<RegisterUserInput>, res: Response) {
   try {
@@ -31,36 +29,35 @@ export async function register(req: Request<RegisterUserInput>, res: Response) {
     const verificationCode = await generateVerificationCode(user.email);
     user.verificationCode = verificationCode;
     await user.save();
-    res.json({ message: 'Account was created successfullly' });
+    res.json({ message: t('account_create_success') });
   } catch (e) {
     logger.error(e);
-    return res.status(httpStatus.CONFLICT).send({ message: 'Kontot finns. Logga in istället.' });
+    return res.status(httpStatus.CONFLICT).send({ message: t('account_already_exists') });
   }
 }
 
-export async function login(req: Request<unknown, unknown, LoginInput>, res: Response) {
+export async function login(req: Request<LoginInput>, res: Response) {
   try {
-    const message = 'Ogiltig e-post eller lösenord';
     const { email, password } = req.body;
 
     let user = await UserModel.findOne({ email });
 
     if (!user) {
-      return res.status(httpStatus.UNAUTHORIZED).send({ message });
+      return res.status(httpStatus.UNAUTHORIZED).send({ message: t('user_not_found') });
     }
 
     const isValid = await user.comparePassword(password);
 
     if (!isValid) {
-      return res.status(httpStatus.UNAUTHORIZED).send({ message });
+      return res.status(httpStatus.UNAUTHORIZED).send({ message: t('login_invalid') });
     }
 
     if (!user.verified) {
-      return res.status(httpStatus.UNAUTHORIZED).send({ message: 'Vänligen verifiera din e-post' });
+      return res.status(httpStatus.FORBIDDEN).send({ message: t('account_not_verified') });
     }
 
-    if (user.disabled) {
-      return res.status(httpStatus.UNAUTHORIZED).send({ message: 'Kontakta oss för mer information.' });
+    if (!user.active) {
+      return res.status(httpStatus.UNAUTHORIZED).send({ message: t('login_invalid') });
     }
 
     const accessToken = signAccessToken({ id: user.id, email: user.email });
@@ -73,7 +70,7 @@ export async function login(req: Request<unknown, unknown, LoginInput>, res: Res
       accessToken,
       refreshToken,
       user: user.toJSON(),
-      message: 'Login Successfull',
+      message: t('login_success'),
     });
   } catch (e) {
     logger.error(e);
@@ -91,7 +88,7 @@ export async function verifyUser(req: Request<VerifyUserInput>, res: Response) {
   }
 
   if (user.verified) {
-    return res.status(httpStatus.FORBIDDEN).send({ message: 'Användaren har redan verifierats' });
+    return res.status(httpStatus.FORBIDDEN).send({ message: t('account_not_verified') });
   }
 
   user.verified = true;
@@ -106,24 +103,22 @@ export async function verifyUser(req: Request<VerifyUserInput>, res: Response) {
     accessToken,
     refreshToken,
     user: user.toJSON(),
-    message: 'Användaren har verifierats',
+    message: t('verification_success'),
   });
 }
 
-export async function resendVerificationCode(req: Request<unknown, unknown, ResendVerificationCodeInput>, res: Response) {
-  const message = 'Om en användare med den e-postadressen är registrerad kommer du att få ett e-postmeddelande om lösenordsåterställning';
-
+export async function resendVerificationCode(req: Request<ResendVerificationCodeInput>, res: Response) {
   const { email } = req.body;
 
   const user = await findUserByEmail(email);
 
   if (!user) {
     logger.debug(`User with email ${email} does not exists`);
-    return res.send({ message });
+    return res.send({ message: t('account_not_found') });
   }
 
   if (user.verified) {
-    return res.status(httpStatus.FORBIDDEN).send({ message: 'Den här användaren är redan verifierad' });
+    return res.status(httpStatus.FORBIDDEN).send({ message: t('account_already_verified') });
   }
 
   const verificationCode = await generateVerificationCode(user.email);
@@ -132,25 +127,22 @@ export async function resendVerificationCode(req: Request<unknown, unknown, Rese
 
   await user.save();
 
-  logger.debug(`Kontoaktiveringse-post skickades till ${email}`);
+  logger.debug(`Verification code was resent to ${email}`);
 
-  return res.send({ message });
+  return res.send({ message: t('verification_code_was_sent') });
 }
 
-export async function forgotPassword(req: Request<unknown, unknown, ForgotPasswordInput>, res: Response) {
-  const message = 'Om en användare med den e-postadressen är registrerad kommer du att få ett e-postmeddelande om lösenordsåterställning';
-
+export async function forgotPassword(req: Request<ForgotPasswordInput>, res: Response) {
   const { email } = req.body;
 
   const user = await findUserByEmail(email);
 
   if (!user) {
-    logger.debug(`Användare med e-post ${email} existerar inte`);
-    return res.send({ message });
+    return res.send({ message: t('account_not_found') });
   }
 
   if (!user.verified) {
-    return res.status(httpStatus.FORBIDDEN).send({ message: 'Användaren är inte verifierad' });
+    return res.status(httpStatus.FORBIDDEN).send({ message: t('account_not_verified') });
   }
 
   const passwordResetCode = await generatePasswordResetCode(user.email);
@@ -159,12 +151,12 @@ export async function forgotPassword(req: Request<unknown, unknown, ForgotPasswo
 
   await user.save();
 
-  logger.debug(`E-postmeddelande om lösenordsåterställning har skickats till ${email}`);
+  logger.debug(`Reset password link was sent to ${email}`);
 
-  return res.send({ message });
+  return res.send({ message: t('reset_password_link_sent') });
 }
 
-export async function resetPassword(req: Request<ResetPasswordInput['query'], unknown, ResetPasswordInput['body']>, res: Response) {
+export async function resetPassword(req: Request<ResetPasswordInput>, res: Response) {
   const { passwordResetCode } = req.query as { passwordResetCode: string };
 
   const { password } = req.body;
@@ -172,7 +164,7 @@ export async function resetPassword(req: Request<ResetPasswordInput['query'], un
   const user = await findUser({ passwordResetCode });
 
   if (!user || !user.passwordResetCode || user.passwordResetCode !== passwordResetCode) {
-    return res.status(httpStatus.BAD_REQUEST).send({ message: 'Kunde inte återställa användarlösenordet' });
+    return res.status(httpStatus.BAD_REQUEST).send({ message: t('not_allowed') });
   }
 
   user.passwordResetCode = null;
@@ -181,10 +173,10 @@ export async function resetPassword(req: Request<ResetPasswordInput['query'], un
 
   await user.save();
 
-  return res.send({ message: 'Lösenordet har uppdaterats. Vänligen logga in.' });
+  return res.send({ message: t('password_reset_success') });
 }
 
-export async function newPassword(req: Request<NewPasswordInput['body']>, res: Response) {
+export async function newPassword(req: Request<NewPasswordInput>, res: Response) {
   const { password } = req.body;
 
   const user = res.locals.user;
@@ -193,12 +185,12 @@ export async function newPassword(req: Request<NewPasswordInput['body']>, res: R
 
   await user.save();
 
-  return res.send({ message: 'Lösenordet har uppdaterats. Vänligen logga in.' });
+  return res.send({ message: t('password_reset_success') });
 }
 
 export async function getCurrentUser(req: Request, res: Response) {
   let user = res.locals.user;
-  user = await (await (await (await user.populate('company')).populate('employee')).populate('profilePicture')).populate('resume');
+  user = await user.populate('profilePicture');
   return res.send({ ...user.toJSON() });
 }
 
@@ -208,5 +200,5 @@ export async function token(req: Request<unknown, unknown, NewTokenInput>, res: 
   if (newAccessToken) {
     return res.send({ token: newAccessToken });
   }
-  return res.status(httpStatus.FORBIDDEN).send({ message: 'Det gick inte att generera en ny åtkomsttoken. Försök att logga in.' });
+  return res.status(httpStatus.FORBIDDEN).send({ message: t('not_allowed') });
 }

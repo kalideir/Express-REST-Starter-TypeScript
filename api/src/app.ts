@@ -1,10 +1,5 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-require('dotenv').config();
 import express from 'express';
-import config from 'config';
 import compress from 'compression';
-import { dbConnect } from './utils';
-import { logger } from './utils';
 import routes from './routes';
 import deserializeUser from './middleware/deserializeUser';
 import cors from 'cors';
@@ -12,6 +7,7 @@ import helmet from 'helmet';
 import i18n from 'i18next';
 import i18nBackend from 'i18next-fs-backend';
 import i18nMiddleware from 'i18next-http-middleware';
+import listRoutes from 'express-list-routes';
 
 i18n
   .use(i18nBackend)
@@ -22,8 +18,6 @@ i18n
       loadPath: './locales/{{lng}}/translation.json',
     },
   });
-
-const baseUrl = config.get<string>('baseUrl');
 
 const app = express();
 
@@ -50,12 +44,6 @@ app.use(i18nMiddleware.handle(i18n));
 
 app.use('/api/', routes);
 
-const port = config.get('port');
-const PORT = process.env.PORT || port;
+listRoutes(routes, { prefix: '/api/' });
 
-app.listen(PORT, async () => {
-  await dbConnect();
-
-  logger.info(`App started at ${baseUrl}`);
-  // expressListRoutes(routes, { prefix: '/api/' });
-});
+export default app;

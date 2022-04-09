@@ -40,7 +40,7 @@ export async function signRefreshToken({ id, email }: RefreshTokenJWTPayload) {
 
 export function signAccessToken(payload: AccessTokenJWTPayload) {
   const accessToken = signJwt(payload, 'secret', {
-    expiresIn: '15h', // requires change
+    expiresIn: '1h', // requires change
   });
 
   return accessToken;
@@ -64,8 +64,6 @@ export function generateVerificationCode(email: string) {
 
 export async function reIssueAccessToken({ refreshToken }: { refreshToken: string }) {
   const decoded = verifyJwt(refreshToken, 'secret') as RefreshTokenJWTPayload;
-
-  console.log(decoded, refreshToken);
 
   if (!decoded || !get(decoded, 'id')) return false;
 

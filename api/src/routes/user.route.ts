@@ -37,7 +37,7 @@ const router = Router();
  */
 router.patch('/', requireUser, validate(updateUserSchema), controller.update);
 
-router.delete('/:id', requireStaff, validate(deleteUserSchema), controller.deleteUser);
+router.delete('/:id', requireStaff, validate(deleteUserSchema), controller.remove);
 
 /**
  * @swagger

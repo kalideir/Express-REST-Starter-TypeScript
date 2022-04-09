@@ -6,9 +6,9 @@
     "auditLog": "/Users/furkan/Desktop/github projects/Express-REST-Starter/api/src/logs/error/.44ea1f0ddabefa3248daa20119f5b944647ec8f2-audit.json",
     "files": [
         {
-            "date": 1649527313761,
-            "name": "/Users/furkan/Desktop/github projects/Express-REST-Starter/api/src/logs/error/2022-04-09.log",
-            "hash": "5345abe7798fd108f471443d850ac5eb"
+            "date": 1649540989992,
+            "name": "/Users/furkan/Desktop/github projects/Express-REST-Starter/api/src/logs/error/2022-04-10.log",
+            "hash": "910b0b42581a71ac24a33879f2bde1d5"
         }
     ],
     "hashType": "md5"

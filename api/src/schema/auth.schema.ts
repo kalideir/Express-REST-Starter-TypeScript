@@ -1,4 +1,5 @@
 import { object, string, TypeOf } from 'zod';
+import { t } from '../utils';
 
 /**
  * @swagger
@@ -31,11 +32,11 @@ import { object, string, TypeOf } from 'zod';
 export const registerUserSchema = object({
   body: object({
     password: string({
-      required_error: 'password is required',
-    }).min(6, 'Password must be at least 6 charachters'),
+      required_error: t('password_required'),
+    }).min(6, t('password_field_length')),
     email: string({
-      required_error: 'Email is required',
-    }).email('Not a valid Email'),
+      required_error: t('email_required'),
+    }).email(t('email_invalid')),
   }),
 });
 
@@ -72,11 +73,11 @@ export const registerUserSchema = object({
 export const loginSchema = object({
   body: object({
     email: string({
-      required_error: 'Email is required',
-    }).email('Not a valid Email'),
+      required_error: t('email_required'),
+    }).email(t('email_invalid')),
     password: string({
-      required_error: 'Password is required',
-    }).min(6, 'Password must be at least 6 charachters'),
+      required_error: t('password_required'),
+    }).min(6, t('password_field_length')),
   }),
 });
 
@@ -132,8 +133,8 @@ export const verifyUserSchema = object({
 export const resendVerificationCodeSchema = object({
   body: object({
     email: string({
-      required_error: 'Email is required',
-    }).email('Not a valid Email'),
+      required_error: t('email_required'),
+    }).email(t('email_invalid')),
   }),
 });
 
@@ -165,8 +166,8 @@ export const resendVerificationCodeSchema = object({
 export const forgotPasswordSchema = object({
   body: object({
     email: string({
-      required_error: 'Email is required',
-    }).email('Not a valid Email'),
+      required_error: t('email_required'),
+    }).email(t('email_invalid')),
   }),
 });
 
@@ -204,13 +205,13 @@ export const resetPasswordSchema = object({
   }),
   body: object({
     password: string({
-      required_error: 'Password is required',
-    }).min(6, 'Password must be at least 6 charachters'),
+      required_error: t('password_required'),
+    }).min(6, t('password_field_length')),
     passwordConfirmation: string({
-      required_error: 'Password confirmation is required',
+      required_error: t('password_confirmation_required'),
     }),
   }).refine(data => data.password === data.passwordConfirmation, {
-    message: "Passwords dont't match",
+    message: t('password_dont_match'),
     path: ['passwordConfirmation'],
   }),
 });
@@ -246,13 +247,13 @@ export const resetPasswordSchema = object({
 export const newPasswordSchema = object({
   body: object({
     password: string({
-      required_error: 'Password is required',
-    }).min(6, 'Password must be at least 6 charachters'),
+      required_error: t('password_required'),
+    }).min(6, t('password_field_length')),
     passwordConfirmation: string({
-      required_error: 'Password confirmation is required',
+      required_error: t('password_confirmation_required'),
     }),
   }).refine(data => data.password === data.passwordConfirmation, {
-    message: "Passwords don't match",
+    message: t('password_dont_match'),
     path: ['passwordConfirmation'],
   }),
 });
@@ -276,7 +277,7 @@ export const newPasswordSchema = object({
  */
 export const tokenSchema = object({
   body: object({
-    refreshToken: string({ required_error: 'Refresh token is required to generate new access token' }),
+    refreshToken: string({ required_error: t('refresh_token_required') }),
   }),
 });
 
