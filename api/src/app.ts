@@ -1,12 +1,13 @@
 import express from 'express';
 import compress from 'compression';
 import routes from './routes';
-import deserializeUser from './middleware/deserializeUser';
+import deserializeUser from './middleware/deserializeUser.middleware';
 import cors from 'cors';
 import helmet from 'helmet';
 import i18n from 'i18next';
 import i18nBackend from 'i18next-fs-backend';
 import i18nMiddleware from 'i18next-http-middleware';
+import { error } from './middleware';
 // import listRoutes from 'express-list-routes';
 
 i18n
@@ -43,6 +44,8 @@ app.use(deserializeUser);
 app.use(i18nMiddleware.handle(i18n));
 
 app.use('/api/', routes);
+
+app.use(error);
 
 // listRoutes(routes, { prefix: '/api/' });
 

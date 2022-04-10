@@ -11,6 +11,7 @@ import {
   tokenSchema,
   verifyUserSchema,
 } from '../schema';
+import { use } from '../utils';
 
 const router = Router();
 
@@ -40,7 +41,7 @@ const router = Router();
  *      400:
  *        description: Bad request
  */
-router.post('/register', validate(registerUserSchema), controller.register);
+router.post('/register', validate(registerUserSchema), use(controller.register));
 
 /**
  * @swagger
@@ -68,7 +69,7 @@ router.post('/register', validate(registerUserSchema), controller.register);
  *      400:
  *        description: Bad request
  */
-router.post('/login', validate(loginSchema), controller.login);
+router.post('/login', validate(loginSchema), use(controller.login));
 
 /**
  * @swagger
@@ -96,7 +97,7 @@ router.post('/login', validate(loginSchema), controller.login);
  *      400:
  *        description: Bad request
  */
-router.post('/verifyUser', validate(verifyUserSchema), controller.verifyUser);
+router.post('/verifyUser', validate(verifyUserSchema), use(controller.verifyUser));
 
 /**
  * @swagger
@@ -125,7 +126,7 @@ router.post('/verifyUser', validate(verifyUserSchema), controller.verifyUser);
  *      400:
  *        description: Bad request
  */
-router.post('/resendVerificationCode', validate(resendVerificationCodeSchema), controller.resendVerificationCode);
+router.post('/resendVerificationCode', validate(resendVerificationCodeSchema), use(controller.resendVerificationCode));
 
 /**
  * @swagger
@@ -218,7 +219,7 @@ router.post('/resetPassword', validate(resetPasswordSchema), controller.resetPas
  *      400:
  *        description: Bad request
  */
-router.post('/newPassword', requireUser, validate(newPasswordSchema), controller.newPassword);
+router.post('/newPassword', requireUser, validate(newPasswordSchema), use(controller.newPassword));
 
 /**
  * @swagger
@@ -237,7 +238,7 @@ router.post('/newPassword', requireUser, validate(newPasswordSchema), controller
  *            schema:
  *              $ref: '#/components/schemas/GetUserResponse'
  */
-router.get('/me', requireUser, controller.getCurrentUser);
+router.get('/me', requireUser, use(controller.getCurrentUser));
 
 /**
  * @swagger
@@ -261,6 +262,6 @@ router.get('/me', requireUser, controller.getCurrentUser);
  *            schema:
  *              $ref: '#/components/schemas/NewTokenResponse'
  */
-router.post('/token', validate(tokenSchema), controller.token);
+router.post('/token', validate(tokenSchema), use(controller.token));
 
 export default router;

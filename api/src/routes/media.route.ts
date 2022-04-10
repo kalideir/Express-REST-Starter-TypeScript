@@ -3,6 +3,7 @@ import * as controller from '../controllers/media.controller';
 import { requireAdmin, requireUser, validate } from '../middleware';
 import { createMediaSchema, deleteMediaSchema } from '../schema';
 import Multer, { memoryStorage } from 'multer';
+import { use } from '../utils';
 
 const router = Router();
 
@@ -47,7 +48,7 @@ router.param('id', controller.load);
  *      400:
  *        description: Bad request
  */
-router.post('/', multer.single('file'), validate(createMediaSchema), controller.create);
+router.post('/', multer.single('file'), validate(createMediaSchema), use(controller.create));
 
 /**
  * @swagger
@@ -74,10 +75,10 @@ router.post('/', multer.single('file'), validate(createMediaSchema), controller.
  *      400:
  *        description: Bad request
  */
-router.delete('/:id', validate(deleteMediaSchema), controller.remove);
+router.delete('/:id', validate(deleteMediaSchema), use(controller.remove));
 
-router.route('/:id').get(controller.get);
+router.route('/:id').get(use(controller.get));
 
-router.post('/imageUpload', requireUser, multer.single('image'), controller.upload);
+router.post('/imageUpload', requireUser, multer.single('image'), use(controller.upload));
 
 export default router;

@@ -1,5 +1,5 @@
-import { existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
+import { existsSync, mkdirSync } from 'fs';
 import winston from 'winston';
 import winstonDaily from 'winston-daily-rotate-file';
 import config from 'config';
@@ -51,11 +51,12 @@ const logger = winston.createLogger({
   ],
 });
 
-// logger.add(
-//   new winston.transports.Console({
-//     format: winston.format.combine(winston.format.splat(), winston.format.colorize()),
-//   }),
-// );
+logger.add(
+  new winston.transports.Console({
+    level: 'info',
+    format: winston.format.combine(winston.format.splat(), winston.format.colorize()),
+  }),
+);
 
 export const responseLogger = request => {
   const { query } = request.request;
