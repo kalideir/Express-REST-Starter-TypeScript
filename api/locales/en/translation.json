@@ -3,6 +3,7 @@
     "account_already_exists": "Account already exists",
     "account_not_found": "Account not found",
     "login_invalid": "Login is invalid",
+    "no_auth": "Authentication required",
     "account_not_verified": "Please verify your account",
     "login_success": "Login successfull",
     "account_already_verified": "Account is already verified",

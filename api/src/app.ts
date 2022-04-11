@@ -1,6 +1,7 @@
 import express from 'express';
 import compress from 'compression';
 import routes from './routes';
+import cookieParser from 'cookie-parser';
 import deserializeUser from './middleware/deserializeUser.middleware';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -8,6 +9,7 @@ import i18n from 'i18next';
 import i18nBackend from 'i18next-fs-backend';
 import i18nMiddleware from 'i18next-http-middleware';
 import { error } from './middleware';
+import initializedPassport from './auth';
 // import listRoutes from 'express-list-routes';
 
 i18n
@@ -22,11 +24,15 @@ i18n
 
 const app = express();
 
+app.use(cookieParser());
+
 app.use(express.json());
 
 app.use(compress());
 
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+initializedPassport(app);
 
 app.use(cors());
 

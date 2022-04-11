@@ -1,5 +1,5 @@
-import { Request, Response } from 'express';
-import httpStatus from 'http-status';
+import { NextFunction, Request, Response } from 'express';
+import { ApiError } from '../errors';
 import { UserModel } from '../models';
 import {
   RegisterUserInput,
@@ -12,7 +12,6 @@ import {
   NewPasswordInput,
 } from '../schema';
 import {
-  registerUser,
   findUser,
   findUserByEmail,
   generatePasswordResetCode,
@@ -23,72 +22,67 @@ import {
 } from '../services';
 import { logger, t } from '../utils';
 
-export async function register(req: Request<RegisterUserInput>, res: Response) {
-  try {
-    const user = await registerUser(req.body);
-    const verificationCode = await generateVerificationCode(user.email);
-    user.verificationCode = verificationCode;
-    await user.save();
-    res.json({ message: t('account_create_success') });
-  } catch (e) {
-    logger.error(e);
-    return res.status(httpStatus.CONFLICT).send({ message: t('account_already_exists') });
+export async function register(req: Request<RegisterUserInput>, res: Response, next: NextFunction) {
+  const input = req.body;
+  const exists = await findUserByEmail(input.email);
+  if (exists) {
+    return next(ApiError.conflict(t('account_already_exists')));
   }
+  const user = await UserModel.create(input);
+  user.save();
+  const verificationCode = await generateVerificationCode(user.email);
+  user.verificationCode = verificationCode;
+  await user.save();
+  res.json({ message: t('account_create_success') });
 }
 
-export async function login(req: Request<LoginInput>, res: Response) {
-  try {
-    const { email, password } = req.body;
+export async function login(req: Request<LoginInput>, res: Response, next: NextFunction) {
+  const { email, password } = req.body;
+  let user = await findUserByEmail(email);
 
-    let user = await UserModel.findOne({ email });
-
-    if (!user) {
-      return res.status(httpStatus.UNAUTHORIZED).send({ message: t('user_not_found') });
-    }
-
-    const isValid = await user.comparePassword(password);
-
-    if (!isValid) {
-      return res.status(httpStatus.UNAUTHORIZED).send({ message: t('login_invalid') });
-    }
-
-    if (!user.verified) {
-      return res.status(httpStatus.FORBIDDEN).send({ message: t('account_not_verified') });
-    }
-
-    if (!user.active) {
-      return res.status(httpStatus.UNAUTHORIZED).send({ message: t('login_invalid') });
-    }
-
-    const accessToken = signAccessToken({ id: user.id, email: user.email });
-
-    const refreshToken = await signRefreshToken({ id: user._id, email: user.email });
-
-    user = await user.populate('profilePicture');
-
-    return res.send({
-      accessToken,
-      refreshToken,
-      user: user.toJSON(),
-      message: t('login_success'),
-    });
-  } catch (e) {
-    logger.error(e);
-    return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({ message: e.message });
+  if (!user) {
+    return next(ApiError.unauthorized(t('user_not_found')));
   }
+
+  const isValid = await user.comparePassword(password);
+
+  if (!isValid) {
+    return next(ApiError.unauthorized(t('login_invalid')));
+  }
+
+  if (!user.verified) {
+    return next(ApiError.unauthorized(t('account_not_verified')));
+  }
+
+  if (!user.active) {
+    return next(ApiError.unauthorized(t('login_invalid')));
+  }
+
+  const accessToken = signAccessToken({ id: user.id, email: user.email });
+
+  const refreshToken = await signRefreshToken({ id: user._id, email: user.email });
+
+  user = await user.populate('profilePicture');
+
+  return res.send({
+    accessToken,
+    refreshToken,
+    user: user.toJSON(),
+    message: t('login_success'),
+  });
 }
 
-export async function verifyUser(req: Request<VerifyUserInput>, res: Response) {
+export async function verifyUser(req: Request<VerifyUserInput>, res: Response, next: NextFunction) {
   const { verificationCode } = req.query;
 
   const user = await findUser({ verificationCode });
 
   if (!user) {
-    return res.status(httpStatus.NOT_FOUND);
+    return next(ApiError.unauthorized(t('user_not_found')));
   }
 
   if (user.verified) {
-    return res.status(httpStatus.FORBIDDEN).send({ message: t('account_not_verified') });
+    return next(ApiError.forbidden(t('account_already_verified')));
   }
 
   user.verified = true;
@@ -107,18 +101,17 @@ export async function verifyUser(req: Request<VerifyUserInput>, res: Response) {
   });
 }
 
-export async function resendVerificationCode(req: Request<ResendVerificationCodeInput>, res: Response) {
+export async function resendVerificationCode(req: Request<ResendVerificationCodeInput>, res: Response, next: NextFunction) {
   const { email } = req.body;
 
   const user = await findUserByEmail(email);
 
   if (!user) {
-    logger.debug(`User with email ${email} does not exists`);
-    return res.send({ message: t('account_not_found') });
+    return next(ApiError.unauthorized(t('user_not_found')));
   }
 
   if (user.verified) {
-    return res.status(httpStatus.FORBIDDEN).send({ message: t('account_already_verified') });
+    return next(ApiError.forbidden(t('account_already_verified')));
   }
 
   const verificationCode = await generateVerificationCode(user.email);
@@ -132,17 +125,17 @@ export async function resendVerificationCode(req: Request<ResendVerificationCode
   return res.send({ message: t('verification_code_was_sent') });
 }
 
-export async function forgotPassword(req: Request<ForgotPasswordInput>, res: Response) {
+export async function forgotPassword(req: Request<ForgotPasswordInput>, res: Response, next: NextFunction) {
   const { email } = req.body;
 
   const user = await findUserByEmail(email);
 
   if (!user) {
-    return res.send({ message: t('account_not_found') });
+    return next(ApiError.unauthorized(t('user_not_found')));
   }
 
   if (!user.verified) {
-    return res.status(httpStatus.FORBIDDEN).send({ message: t('account_not_verified') });
+    return next(ApiError.forbidden(t('account_not_verified')));
   }
 
   const passwordResetCode = await generatePasswordResetCode(user.email);
@@ -156,7 +149,7 @@ export async function forgotPassword(req: Request<ForgotPasswordInput>, res: Res
   return res.send({ message: t('reset_password_link_sent') });
 }
 
-export async function resetPassword(req: Request<ResetPasswordInput>, res: Response) {
+export async function resetPassword(req: Request<ResetPasswordInput>, res: Response, next: NextFunction) {
   const { passwordResetCode } = req.query as { passwordResetCode: string };
 
   const { password } = req.body;
@@ -164,7 +157,7 @@ export async function resetPassword(req: Request<ResetPasswordInput>, res: Respo
   const user = await findUser({ passwordResetCode });
 
   if (!user || !user.passwordResetCode || user.passwordResetCode !== passwordResetCode) {
-    return res.status(httpStatus.BAD_REQUEST).send({ message: t('not_allowed') });
+    return next(ApiError.forbidden(t('not_allowed')));
   }
 
   user.passwordResetCode = null;
@@ -194,11 +187,11 @@ export async function getCurrentUser(req: Request, res: Response) {
   return res.send({ ...user.toJSON() });
 }
 
-export async function token(req: Request<unknown, unknown, NewTokenInput>, res: Response) {
+export async function token(req: Request<unknown, unknown, NewTokenInput>, res: Response, next: NextFunction) {
   const { refreshToken } = req.body;
   const newAccessToken = await reIssueAccessToken({ refreshToken });
   if (newAccessToken) {
     return res.send({ token: newAccessToken });
   }
-  return res.status(httpStatus.FORBIDDEN).send({ message: t('not_allowed') });
+  return next(ApiError.forbidden(t('not_allowed')));
 }

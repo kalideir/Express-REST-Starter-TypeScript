@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import * as controller from '../controllers/auth.controller';
-import { requireUser, validate } from '../middleware';
+import { authorize, requireUser, validate } from '../middleware';
 import {
   forgotPasswordSchema,
   loginSchema,
@@ -238,7 +238,7 @@ router.post('/newPassword', requireUser, validate(newPasswordSchema), use(contro
  *            schema:
  *              $ref: '#/components/schemas/GetUserResponse'
  */
-router.get('/me', requireUser, use(controller.getCurrentUser));
+router.get('/me', authorize, use(controller.getCurrentUser));
 
 /**
  * @swagger

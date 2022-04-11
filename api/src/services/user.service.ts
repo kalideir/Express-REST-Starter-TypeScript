@@ -1,4 +1,4 @@
-import { Role, UserDocument, UserModel } from '../models';
+import { UserDocument, UserModel } from '../models';
 import { UpdateUserInput } from '../schema';
 import { FilterQuery } from 'mongoose';
 
@@ -9,21 +9,13 @@ export type CreateUserPartial = Partial<{
 }>;
 
 export async function createUser(input: Partial<CreateUserPartial>) {
-  try {
-    const user = await UserModel.create(input);
-    return user.save();
-  } catch (e) {
-    throw new Error(e);
-  }
+  const user = await UserModel.create(input);
+  return user.save();
 }
 
 export async function updateUser(id: string, input: UpdateUserInput['body']) {
-  try {
-    const user = await UserModel.findByIdAndUpdate(id, { ...input }, { new: true });
-    return await user.save();
-  } catch (e) {
-    throw new Error(e);
-  }
+  const user = await UserModel.findByIdAndUpdate(id, { ...input }, { new: true });
+  return await user.save();
 }
 
 export async function findUser(query: FilterQuery<UserDocument>) {
@@ -31,7 +23,7 @@ export async function findUser(query: FilterQuery<UserDocument>) {
 }
 
 export async function findUsers(query: FilterQuery<UserDocument>) {
-  return UserModel.find(query).populate('company').populate('employee').exec();
+  return UserModel.find(query);
 }
 
 export function findUserById(id: string) {

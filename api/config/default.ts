@@ -11,7 +11,7 @@ export default {
     secure: process.env.EMAIL_IS_SECURE,
   },
   saltWorkFactor: 100,
-  secret: process.env.JWT_SECRET,
+  jwtSecret: process.env.JWT_SECRET || 'secret',
   awsAccessId: process.env.AWS_ACCESS_ID || '',
   awsSecretKey: process.env.AWS_SECRET_KEY || '',
   awsS3BucketName: process.env.AWS_S3_BUCKET_NAME || '',

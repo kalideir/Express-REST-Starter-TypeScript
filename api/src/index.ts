@@ -12,7 +12,7 @@ import config from 'config';
 import app from './app';
 import { dbConnect, logger, validateEnv } from './utils';
 
-validateEnv();
+// validateEnv();
 
 const PORT = config.get<number>('port');
 

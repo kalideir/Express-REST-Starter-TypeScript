@@ -9,7 +9,7 @@ const deserializeUser = async (req: Request, res: Response, next: NextFunction) 
     return next();
   }
 
-  const decoded: AccessTokenJWTPayload | null = verifyJwt(accessToken, 'secret');
+  const decoded: AccessTokenJWTPayload | null = verifyJwt(accessToken);
 
   if (decoded) {
     const user = await findUserById(decoded.id);
