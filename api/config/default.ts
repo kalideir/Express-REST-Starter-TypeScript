@@ -15,4 +15,8 @@ export default {
   awsAccessId: process.env.AWS_ACCESS_ID || '',
   awsSecretKey: process.env.AWS_SECRET_KEY || '',
   awsS3BucketName: process.env.AWS_S3_BUCKET_NAME || '',
+
+  googleClientId: process.env.GOOGLE_CLIENT_ID,
+  googleGoogleSecret: process.env.GOOGLE_CLIENT_SECRET,
+  googleCallbackURL: process.env.GOOGLE_CALLBACK_URL,
 };

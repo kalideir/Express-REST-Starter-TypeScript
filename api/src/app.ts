@@ -31,8 +31,6 @@ app.use(compress());
 
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-initializedPassport(app);
-
 app.use(cors());
 
 app.use(helmet());
@@ -45,6 +43,8 @@ app.use(
 );
 
 app.use(i18nMiddleware.handle(i18n));
+
+initializedPassport(app);
 
 app.use('/api/', routes);
 

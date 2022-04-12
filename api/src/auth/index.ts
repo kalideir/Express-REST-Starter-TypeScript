@@ -5,11 +5,16 @@ import { Application } from 'express';
 import config from 'config';
 import { findUser } from '../services';
 import { t } from '../utils';
+import { Strategy as GoogleStrategy, StrategyOptionsWithRequest } from 'passport-google-oauth2';
+
+const googleClientId = config.get<string>('googleClientId');
+const googleGoogleSecret = config.get<string>('googleGoogleSecret');
+const googleCallbackURL = config.get<string>('googleCallbackURL');
 
 const cookieExtractor = function (req) {
   let token = null;
-  if (req && req.cookies) {
-    token = req.cookies['jwt'];
+  if (req && req.signedCookies && req.signedCookies.jwt) {
+    token = req.signedCookies['jwt']['token'];
   }
   return token;
 };
@@ -19,9 +24,17 @@ const jwtOptions = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme('Bearer'),
 };
 
-const jwt = async (payload, done) => {
+const googleOptions: StrategyOptionsWithRequest = {
+  clientID: googleClientId,
+  clientSecret: googleGoogleSecret,
+  callbackURL: googleCallbackURL,
+  passReqToCallback: true,
+};
+
+const jwtHandler = (role: Role) => async (payload, done) => {
+  console.log({ payload });
   try {
-    const user = await findUser({ _id: payload.sub, role: Role.USER });
+    const user = await findUser({ _id: payload.sub, role });
     if (!user) {
       return done(null, false, { message: t('account_not_found') });
     }
@@ -31,50 +44,37 @@ const jwt = async (payload, done) => {
   }
 };
 
-const staffJwt = async (payload, done) => {
+const googleOauthHandler = async (request, accessToken, refreshToken, profile, done) => {
   try {
-    const user = await findUser({ _id: payload.sub, role: Role.STAFF });
+    const user = await findUser({ email: profile.email });
     if (!user) {
-      return done(null, false);
+      return done(null, false, { message: t('account_not_found') });
     }
     return done(null, user);
   } catch (error) {
-    return done(error, false);
+    return done(error, false, { message: t('something_went_wrong') });
   }
 };
 
-const adminJwt = async (payload, done) => {
-  try {
-    const user = await findUser({ _id: payload.sub, role: Role.ADMIN });
-    if (!user) {
-      return done(null, false);
-    }
-    return done(null, user);
-  } catch (error) {
-    return done(error, false);
-  }
-};
-
-export enum JwtTypes {
+export enum StrategyTypes {
   Jwt = 'jwt',
   StaffJwt = 'staffJwt',
   AdminJwt = 'adminJwt',
+  GoogleOauth = 'googleOauth',
 }
 
 export default function (app: Application) {
-  passport.use(JwtTypes.Jwt, new Strategy(jwtOptions, jwt));
-  passport.use(JwtTypes.StaffJwt, new Strategy(jwtOptions, staffJwt));
-  passport.use(JwtTypes.AdminJwt, new Strategy(jwtOptions, adminJwt));
+  passport.use(StrategyTypes.Jwt, new Strategy(jwtOptions, jwtHandler(Role.USER)));
+  passport.use(StrategyTypes.StaffJwt, new Strategy(jwtOptions, jwtHandler(Role.STAFF)));
+  passport.use(StrategyTypes.AdminJwt, new Strategy(jwtOptions, jwtHandler(Role.ADMIN)));
+  passport.use(StrategyTypes.GoogleOauth, new GoogleStrategy(googleOptions, googleOauthHandler));
 
   passport.serializeUser((user: Partial<UserDocument>, done) => {
-    console.log(user, '234234234');
-    delete user.password;
-    done(null, user);
+    done(null, user.id);
   });
 
-  passport.deserializeUser((user, done) => {
-    console.log(user, '234234234');
-    done(null, user);
+  passport.deserializeUser((id, done) => {
+    done(null, id);
   });
 
   app.use(passport.initialize());

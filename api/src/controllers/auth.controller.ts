@@ -195,3 +195,8 @@ export async function token(req: Request<unknown, unknown, NewTokenInput>, res: 
   }
   return next(ApiError.forbidden(t('not_allowed')));
 }
+
+export async function logout(req: Request, res: Response, next: NextFunction) {
+  req.logout();
+  return res.redirect('/');
+}
