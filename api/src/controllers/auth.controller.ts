@@ -20,6 +20,7 @@ import {
   signAccessToken,
   signRefreshToken,
 } from '../services';
+import { EnhancedRequest } from '../types';
 import { logger, t } from '../utils';
 
 export async function register(req: Request<RegisterUserInput>, res: Response, next: NextFunction) {
@@ -29,7 +30,6 @@ export async function register(req: Request<RegisterUserInput>, res: Response, n
     return next(ApiError.conflict(t('account_already_exists')));
   }
   const user = await UserModel.create(input);
-  user.save();
   const verificationCode = await generateVerificationCode(user.email);
   user.verificationCode = verificationCode;
   await user.save();
@@ -58,9 +58,9 @@ export async function login(req: Request<LoginInput>, res: Response, next: NextF
     return next(ApiError.unauthorized(t('login_invalid')));
   }
 
-  const accessToken = signAccessToken({ id: user.id, email: user.email });
+  const accessToken = signAccessToken({ sub: user._id });
 
-  const refreshToken = await signRefreshToken({ id: user._id, email: user.email });
+  const refreshToken = await signRefreshToken({ sub: user._id });
 
   user = await user.populate('profilePicture');
 
@@ -89,9 +89,9 @@ export async function verifyUser(req: Request<VerifyUserInput>, res: Response, n
   user.verificationCode = null;
   await user.save();
 
-  const accessToken = signAccessToken({ id: user.id, email: user.email });
+  const accessToken = signAccessToken({ sub: user.id });
 
-  const refreshToken = await signRefreshToken({ id: user._id, email: user.email });
+  const refreshToken = await signRefreshToken({ sub: user._id });
 
   return res.send({
     accessToken,
@@ -169,10 +169,10 @@ export async function resetPassword(req: Request<ResetPasswordInput>, res: Respo
   return res.send({ message: t('password_reset_success') });
 }
 
-export async function newPassword(req: Request<NewPasswordInput>, res: Response) {
+export async function newPassword(req: EnhancedRequest<NewPasswordInput>, res: Response) {
   const { password } = req.body;
 
-  const user = res.locals.user;
+  const user = req.user;
 
   user.password = password;
 
@@ -181,10 +181,10 @@ export async function newPassword(req: Request<NewPasswordInput>, res: Response)
   return res.send({ message: t('password_reset_success') });
 }
 
-export async function getCurrentUser(req: Request, res: Response) {
-  let user = res.locals.user;
+export async function me(req: EnhancedRequest, res: Response) {
+  let user = req.user;
   user = await user.populate('profilePicture');
-  return res.send({ ...user.toJSON() });
+  return res.send({ user: user.toJSON() });
 }
 
 export async function token(req: Request<unknown, unknown, NewTokenInput>, res: Response, next: NextFunction) {

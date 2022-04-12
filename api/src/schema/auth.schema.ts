@@ -13,10 +13,10 @@ import { t } from '../utils';
  *      properties:
  *        email:
  *          type: string
- *          default: ''
+ *          default: user@email.com
  *        password:
  *          type: string
- *          default: ''
+ *          default: password
  *    RegisterUserResponse:
  *      type: object
  *      properties:
@@ -52,10 +52,10 @@ export const registerUserSchema = object({
  *      properties:
  *        email:
  *          type: string
- *          default: ''
+ *          default: user@email.com
  *        password:
  *          type: string
- *          default: aqaqaq
+ *          default: password
  *    LoginResponse:
  *        type: object
  *        properties:

@@ -1,26 +1,32 @@
-import httpStatus from 'http-status';
+import { NextFunction, Request, Response } from 'express';
 import passport from 'passport';
+import { JwtTypes } from '../auth';
 import { ApiError } from '../errors';
+import { t } from '../utils';
 
 const handleJWT = (req, res, next) => async (err, user, info) => {
   const error = err || info;
-  console.log(user, info, err);
-  try {
-    if (error || !user) throw error;
-  } catch (e) {
-    return next(e);
+  if (err) {
+    return next(ApiError.internalServerError(error.message || t('something_went_wrong')));
   }
-  if (err || !user) {
-    return next();
+  if (!user) {
+    return next(ApiError.unauthorized(t('unauthorized')));
   }
-  if (user.blocked) {
-    return next();
+  if (!user.active) {
+    return next(ApiError.unauthorized(t('unauthorized')));
   }
-
+  if (!user.verified) {
+    return next(ApiError.unauthorized(t('account_not_verified')));
+  }
   req.user = user;
   return next();
 };
 
-export const authorize = (req, res, next) => passport.authenticate('jwt', { session: false }, handleJWT(req, res, next))(req, res, next);
+export const authorizeUser = (req: Request, res: Response, next: NextFunction) =>
+  passport.authenticate(JwtTypes.Jwt, { session: false }, handleJWT(req, res, next))(req, res, next);
 
-export const oAuth = service => passport.authenticate(service, { session: false });
+export const authorizeStaff = (req: Request, res: Response, next: NextFunction) =>
+  passport.authenticate(JwtTypes.StaffJwt, { session: false }, handleJWT(req, res, next))(req, res, next);
+
+export const authorizeAdmin = (req: Request, res: Response, next: NextFunction) =>
+  passport.authenticate(JwtTypes.AdminJwt, { session: false }, handleJWT(req, res, next))(req, res, next);

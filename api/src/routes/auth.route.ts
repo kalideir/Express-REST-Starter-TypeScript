@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import * as controller from '../controllers/auth.controller';
-import { authorize, requireUser, validate } from '../middleware';
+import { authorizeUser, validate } from '../middleware';
 import {
   forgotPasswordSchema,
   loginSchema,
@@ -219,7 +219,7 @@ router.post('/resetPassword', validate(resetPasswordSchema), controller.resetPas
  *      400:
  *        description: Bad request
  */
-router.post('/newPassword', requireUser, validate(newPasswordSchema), use(controller.newPassword));
+router.post('/newPassword', authorizeUser, validate(newPasswordSchema), use(controller.newPassword));
 
 /**
  * @swagger
@@ -238,7 +238,7 @@ router.post('/newPassword', requireUser, validate(newPasswordSchema), use(contro
  *            schema:
  *              $ref: '#/components/schemas/GetUserResponse'
  */
-router.get('/me', authorize, use(controller.getCurrentUser));
+router.get('/me', authorizeUser, use(controller.me));
 
 /**
  * @swagger

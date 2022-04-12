@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import * as controller from '../controllers/media.controller';
-import { requireAdmin, requireUser, validate } from '../middleware';
+import { authorizeUser, validate } from '../middleware';
 import { createMediaSchema, deleteMediaSchema } from '../schema';
 import Multer, { memoryStorage } from 'multer';
 import { use } from '../utils';
@@ -79,6 +79,6 @@ router.delete('/:id', validate(deleteMediaSchema), use(controller.remove));
 
 router.route('/:id').get(use(controller.get));
 
-router.post('/imageUpload', requireUser, multer.single('image'), use(controller.upload));
+router.post('/imageUpload', authorizeUser, multer.single('image'), use(controller.upload));
 
 export default router;

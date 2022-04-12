@@ -2,7 +2,6 @@ import express from 'express';
 import compress from 'compression';
 import routes from './routes';
 import cookieParser from 'cookie-parser';
-import deserializeUser from './middleware/deserializeUser.middleware';
 import cors from 'cors';
 import helmet from 'helmet';
 import i18n from 'i18next';
@@ -44,8 +43,6 @@ app.use(
     optionsSuccessStatus: 200,
   }),
 );
-
-app.use(deserializeUser);
 
 app.use(i18nMiddleware.handle(i18n));
 

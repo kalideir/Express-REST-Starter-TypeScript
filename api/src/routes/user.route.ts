@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import * as controller from '../controllers/user.controller';
-import { requireStaff, requireUser, validate } from '../middleware';
+import { authorizeUser, validate } from '../middleware';
 import { listUsersSchema, updateUserSchema, getUserSchema, deleteUserSchema } from '../schema';
 import { use } from '../utils';
 
@@ -36,9 +36,9 @@ const router = Router();
  *      400:
  *        description: Bad request
  */
-router.patch('/', requireUser, validate(updateUserSchema), use(controller.update));
+router.patch('/', authorizeUser, validate(updateUserSchema), use(controller.update));
 
-router.delete('/:id', requireStaff, validate(deleteUserSchema), use(controller.remove));
+router.delete('/:id', authorizeUser, validate(deleteUserSchema), use(controller.remove));
 
 /**
  * @swagger
@@ -82,7 +82,7 @@ router.delete('/:id', requireStaff, validate(deleteUserSchema), use(controller.r
  *      400:
  *        description: Bad request
  */
-router.get('/list/users', requireStaff, validate(listUsersSchema), use(controller.listUsers));
+router.get('/list/users', authorizeUser, validate(listUsersSchema), use(controller.listUsers));
 
 /**
  * @swagger
@@ -114,6 +114,6 @@ router.get('/list/users', requireStaff, validate(listUsersSchema), use(controlle
  *      400:
  *        description: Bad request
  */
-router.get('/:id', requireUser, validate(getUserSchema), use(controller.get));
+router.get('/:id', authorizeUser, validate(getUserSchema), use(controller.get));
 
 export default router;

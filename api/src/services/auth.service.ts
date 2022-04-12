@@ -3,20 +3,17 @@ import { findUserById } from '.';
 import { verifyJwt } from '../utils';
 
 export type AccessTokenJWTPayload = {
-  id: string;
-  email: string;
+  sub: string;
 };
 
 export type RefreshTokenJWTPayload = {
-  id: string;
-  email: string;
+  sub: string;
 };
 
-export async function signRefreshToken({ id, email }: RefreshTokenJWTPayload) {
+export async function signRefreshToken({ sub }: RefreshTokenJWTPayload) {
   const refreshToken = signJwt(
     {
-      id,
-      email,
+      sub,
     },
     {
       expiresIn: '1y',
@@ -38,7 +35,7 @@ export function generatePasswordResetCode(email: string) {
   const passwordResetCode = signJwt(
     { email },
     {
-      expiresIn: '90d',
+      expiresIn: '1h',
     },
   );
 
@@ -49,7 +46,7 @@ export function generateVerificationCode(email: string) {
   const verificationCode = signJwt(
     { email },
     {
-      expiresIn: '90d',
+      expiresIn: '1d',
     },
   );
 
@@ -59,13 +56,13 @@ export function generateVerificationCode(email: string) {
 export async function reIssueAccessToken({ refreshToken }: { refreshToken: string }) {
   const decoded = verifyJwt(refreshToken) as RefreshTokenJWTPayload;
 
-  if (!decoded || !decoded.id) return false;
+  if (!decoded || !decoded.sub) return false;
 
-  const user = await findUserById(decoded.id);
+  const user = await findUserById(decoded.sub);
 
   if (!user) return false;
 
-  const accessToken = signAccessToken({ id: user.id, email: user.email });
+  const accessToken = signAccessToken({ sub: user.id });
 
   return accessToken;
 }
