@@ -60,6 +60,11 @@ router.post('/register', validate(registerUserSchema), use(controller.register))
  *     responses:
  *      200:
  *        description: Success
+ *        headers:
+ *          Set-Cookie:
+ *            schema:
+ *              type: string
+ *              example: authCookie=abcde12345; Path=/; HttpOnly
  *        content:
  *          application/json:
  *            schema:
@@ -200,7 +205,7 @@ router.post('/resetPassword', validate(resetPasswordSchema), controller.resetPas
  *     name: Forgot Password
  *     summary: Forgot password
  *     security:
- *       - Bearer: []
+ *       - cookieAuth: []
  *     requestBody:
  *      required: true
  *      content:
@@ -229,7 +234,7 @@ router.post('/newPassword', authorizeUser, validate(newPasswordSchema), use(cont
  *       - Auth
  *     summary: Get user by access token
  *     security:
- *       - Bearer: []
+ *       - cookieAuth: []
  *     responses:
  *      200:
  *        description: Success
@@ -266,7 +271,10 @@ router.post('/token', validate(tokenSchema), use(controller.token));
 
 router.get('/google', googleAuthorize);
 
-router.get('/google/callback', googleRedirect);
+router.get('/google/callback', googleRedirect, (req, res, next) => {
+  console.log(req.user, req.isAuthenticated(), 270);
+  return res.redirect('/');
+});
 
 router.get('/logout', use(controller.logout));
 

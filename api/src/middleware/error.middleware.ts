@@ -6,7 +6,7 @@ import { logger, t } from '../utils';
 
 const error = (error: HttpError, req: Request, res: Response, next: NextFunction) => {
   logger.error(`[${req.method}] ${req.path} >> StatusCode:: ${error.status}, Message:: ${error.message}`);
-
+  console.log(error);
   if (error instanceof HttpError) {
     return res.status(error.status).json({ message: error.message });
   }

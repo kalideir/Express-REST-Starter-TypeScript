@@ -14,7 +14,7 @@ const router = Router();
  *       - Users
  *     summary: Update new user
  *     security:
- *       - Bearer: []
+ *       - cookieAuth: []
  *     requestBody:
  *      required: true
  *      content:
@@ -48,7 +48,7 @@ router.delete('/:id', authorizeUser, validate(deleteUserSchema), use(controller.
  *       - Users
  *     summary: List all users
  *     security:
- *       - Bearer: []
+ *       - cookieAuth: []
  *     parameters:
  *       - name: role
  *         in: query
@@ -92,7 +92,7 @@ router.get('/list/users', authorizeUser, validate(listUsersSchema), use(controll
  *       - Users
  *     summary: Get user data by id
  *     security:
- *       - Bearer: []
+ *       - cookieAuth: []
  *     parameters:
  *       - name: id
  *         in: path

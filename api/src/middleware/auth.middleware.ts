@@ -4,7 +4,7 @@ import { StrategyTypes } from '../auth';
 import { ApiError } from '../errors';
 import { t } from '../utils';
 
-const handleJWT = (req, res, next) => async (err, user, info) => {
+const handler = (req, res, next) => async (err, user, info) => {
   const error = err || info;
   if (err) {
     return next(ApiError.internalServerError(error.message || t('something_went_wrong')));
@@ -25,15 +25,24 @@ const handleJWT = (req, res, next) => async (err, user, info) => {
 };
 
 export const authorizeUser = (req: Request, res: Response, next: NextFunction) =>
-  passport.authenticate(StrategyTypes.Jwt, { session: false }, handleJWT(req, res, next))(req, res, next);
+  passport.authenticate(StrategyTypes.Jwt, { session: false }, handler(req, res, next))(req, res, next);
 
 export const authorizeStaff = (req: Request, res: Response, next: NextFunction) =>
-  passport.authenticate(StrategyTypes.StaffJwt, { session: false }, handleJWT(req, res, next))(req, res, next);
+  passport.authenticate(StrategyTypes.StaffJwt, { session: false }, handler(req, res, next))(req, res, next);
 
 export const authorizeAdmin = (req: Request, res: Response, next: NextFunction) =>
-  passport.authenticate(StrategyTypes.AdminJwt, { session: false }, handleJWT(req, res, next))(req, res, next);
+  passport.authenticate(StrategyTypes.AdminJwt, { session: false }, handler(req, res, next))(req, res, next);
 
 export const googleAuthorize = (req: Request, res: Response, next: NextFunction) =>
   passport.authenticate(StrategyTypes.GoogleOauth, { scope: ['email', 'profile'] })(req, res, next);
 
-export const googleRedirect = (req: Request, res: Response, next: NextFunction) => passport.authenticate(StrategyTypes.GoogleOauth)(req, res, next);
+export const googleRedirect = (req: Request, res: Response, next: NextFunction) =>
+  passport.authenticate(
+    StrategyTypes.GoogleOauth,
+    {
+      // failureRedirect: '/',
+      // successRedirect: '/',
+      session: true,
+    },
+    handler(req, res, next),
+  )(req, res, next);

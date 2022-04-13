@@ -25,7 +25,7 @@ router.param('id', controller.load);
  *     consumes:
  *       - multipart/form-data
  *     security:
- *       - Bearer: []
+ *       - cookieAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -60,7 +60,7 @@ router.post('/', multer.single('file'), validate(createMediaSchema), use(control
  *     consumes:
  *       - application/json
  *     security:
- *       - Bearer: []
+ *       - cookieAuth: []
  *     parameters:
  *      - name: id
  *        in: path

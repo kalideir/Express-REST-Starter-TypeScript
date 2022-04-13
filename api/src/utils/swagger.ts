@@ -61,14 +61,14 @@ const swaggerOptions: swaggerJsdoc.Options = {
         },
       },
       securitySchemes: {
-        Bearer: {
-          type: 'http',
-          scheme: 'bearer',
-          bearerFormat: 'JWT',
+        cookieAuth: {
+          type: 'apiKey',
+          in: 'cookie',
+          name: 'session',
         },
       },
     },
-    security: ['Bearer'],
+    security: ['cookieAuth'],
   },
   apis: ['./src/routes/**/*.ts', './src/models/**/*.ts', './src/schema/**/*.ts'],
 };

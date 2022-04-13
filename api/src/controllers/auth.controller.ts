@@ -16,6 +16,7 @@ import {
   findUserByEmail,
   generatePasswordResetCode,
   generateVerificationCode,
+  getCookie,
   reIssueAccessToken,
   signAccessToken,
   signRefreshToken,
@@ -60,12 +61,15 @@ export async function login(req: Request<LoginInput>, res: Response, next: NextF
 
   const accessToken = signAccessToken({ sub: user._id });
 
+  const cookie = getCookie(accessToken);
+
   const refreshToken = await signRefreshToken({ sub: user._id });
 
   user = await user.populate('profilePicture');
 
+  res.setHeader('Set-Cookie', [cookie]);
+
   return res.send({
-    accessToken,
     refreshToken,
     user: user.toJSON(),
     message: t('login_success'),
@@ -182,6 +186,7 @@ export async function newPassword(req: EnhancedRequest<NewPasswordInput>, res: R
 }
 
 export async function me(req: EnhancedRequest, res: Response) {
+  console.log(req.session, 189);
   let user = req.user;
   user = await user.populate('profilePicture');
   return res.send({ user: user.toJSON() });
@@ -198,5 +203,6 @@ export async function token(req: Request<unknown, unknown, NewTokenInput>, res: 
 
 export async function logout(req: Request, res: Response, next: NextFunction) {
   req.logout();
+  req.session = null;
   return res.redirect('/');
 }

@@ -24,6 +24,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/cookie-session": "^2.0.44",
     "aws-sdk": "^2.1092.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.1",
@@ -31,6 +32,7 @@
     "compression": "^1.7.4",
     "config": "^3.3.7",
     "cookie-parser": "^1.4.6",
+    "cookie-session": "^2.0.0",
     "cors": "^2.8.5",
     "dayjs": "^1.10.7",
     "dotenv": "^16.0.0",

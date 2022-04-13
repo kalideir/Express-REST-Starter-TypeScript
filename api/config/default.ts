@@ -19,4 +19,7 @@ export default {
   googleClientId: process.env.GOOGLE_CLIENT_ID,
   googleGoogleSecret: process.env.GOOGLE_CLIENT_SECRET,
   googleCallbackURL: process.env.GOOGLE_CALLBACK_URL,
+
+  cookieName: process.env.COOKIE_NAME || 'authCookie',
+  cookieKey1: process.env.COOKIE_KEY_ID || 'cookie-key-1',
 };

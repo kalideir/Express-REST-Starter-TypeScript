@@ -1,4 +1,4 @@
-import { Strategy, ExtractJwt } from 'passport-jwt';
+import { Strategy } from 'passport-jwt';
 import passport from 'passport';
 import { Role, UserDocument } from '../models';
 import { Application } from 'express';
@@ -12,16 +12,18 @@ const googleGoogleSecret = config.get<string>('googleGoogleSecret');
 const googleCallbackURL = config.get<string>('googleCallbackURL');
 
 const cookieExtractor = function (req) {
+  const cookieName = config.get<string>('cookieName');
   let token = null;
-  if (req && req.signedCookies && req.signedCookies.jwt) {
-    token = req.signedCookies['jwt']['token'];
+  if (req && req.cookies && req.cookies[cookieName]) {
+    token = req.cookies[cookieName];
   }
+  console.log(req.session, 20);
   return token;
 };
 
 const jwtOptions = {
   secretOrKey: config.get<string>('jwtSecret'),
-  jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme('Bearer'),
+  jwtFromRequest: cookieExtractor,
 };
 
 const googleOptions: StrategyOptionsWithRequest = {
@@ -32,7 +34,6 @@ const googleOptions: StrategyOptionsWithRequest = {
 };
 
 const jwtHandler = (role: Role) => async (payload, done) => {
-  console.log({ payload });
   try {
     const user = await findUser({ _id: payload.sub, role });
     if (!user) {
@@ -68,7 +69,6 @@ export default function (app: Application) {
   passport.use(StrategyTypes.StaffJwt, new Strategy(jwtOptions, jwtHandler(Role.STAFF)));
   passport.use(StrategyTypes.AdminJwt, new Strategy(jwtOptions, jwtHandler(Role.ADMIN)));
   passport.use(StrategyTypes.GoogleOauth, new GoogleStrategy(googleOptions, googleOauthHandler));
-
   passport.serializeUser((user: Partial<UserDocument>, done) => {
     done(null, user.id);
   });
@@ -78,4 +78,5 @@ export default function (app: Application) {
   });
 
   app.use(passport.initialize());
+  // app.use(passport.session());
 }

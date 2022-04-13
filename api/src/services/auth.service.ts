@@ -1,6 +1,7 @@
 import { signJwt } from '../utils/jwt';
 import { findUserById } from '.';
 import { verifyJwt } from '../utils';
+import config from 'config';
 
 export type AccessTokenJWTPayload = {
   sub: string;
@@ -9,6 +10,8 @@ export type AccessTokenJWTPayload = {
 export type RefreshTokenJWTPayload = {
   sub: string;
 };
+
+const expiresIn = 60 * 60;
 
 export async function signRefreshToken({ sub }: RefreshTokenJWTPayload) {
   const refreshToken = signJwt(
@@ -25,10 +28,15 @@ export async function signRefreshToken({ sub }: RefreshTokenJWTPayload) {
 
 export function signAccessToken(payload: AccessTokenJWTPayload) {
   const accessToken = signJwt(payload, {
-    expiresIn: '1h',
+    expiresIn,
   });
 
   return accessToken;
+}
+
+export function getCookie(accessToken: string) {
+  const cookieName = config.get<string>('cookieName');
+  return `${cookieName}=${accessToken}; HttpOnly; Max-Age=${expiresIn};`;
 }
 
 export function generatePasswordResetCode(email: string) {
