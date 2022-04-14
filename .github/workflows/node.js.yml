@@ -18,7 +18,7 @@ jobs:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
     defaults:
       run:
-        working-directory: ./api
+        working-directory: api
 
     steps:
     - uses: actions/checkout@v3
@@ -28,6 +28,6 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - name: install dependencies
-      run: npm ci
+      run: npm i
     - name: build api 
       run: npm run build --if-present
