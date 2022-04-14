@@ -12,6 +12,7 @@ import i18nMiddleware from 'i18next-http-middleware';
 import { error } from './middleware';
 import initializedPassport from './auth';
 import { stream } from './utils';
+import config from 'config';
 // import listRoutes from 'express-list-routes';
 
 i18n
@@ -51,9 +52,9 @@ app.use(i18nMiddleware.handle(i18n));
 
 app.use(
   cookieSession({
-    name: 'authCookie',
+    name: config.get<string>('cookieName'),
     maxAge: 24 * 60 * 60 * 1000,
-    keys: ['-'],
+    keys: [config.get<string>('cookieKey1')],
   }),
 );
 

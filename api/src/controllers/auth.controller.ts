@@ -76,6 +76,7 @@ export async function login(req: Request<LoginInput>, res: Response, next: NextF
 
   return res.send({
     refreshToken,
+    accessToken,
     user: user.toJSON(),
     message: t('login_success'),
   });
