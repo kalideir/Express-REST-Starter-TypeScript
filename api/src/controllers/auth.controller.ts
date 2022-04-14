@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import config from 'config';
 import { ApiError } from '../errors';
 import { UserModel } from '../models';
 import {
@@ -16,7 +17,6 @@ import {
   findUserByEmail,
   generatePasswordResetCode,
   generateVerificationCode,
-  getCookie,
   reIssueAccessToken,
   signAccessToken,
   signRefreshToken,
@@ -61,13 +61,18 @@ export async function login(req: Request<LoginInput>, res: Response, next: NextF
 
   const accessToken = signAccessToken({ sub: user._id });
 
-  const cookie = getCookie(accessToken);
-
   const refreshToken = await signRefreshToken({ sub: user._id });
 
   user = await user.populate('profilePicture');
 
-  res.setHeader('Set-Cookie', [cookie]);
+  const cookieName = config.get<string>('cookieName');
+
+  res.cookie(cookieName, accessToken, {
+    httpOnly: true,
+    sameSite: 'strict',
+    path: '/',
+    secure: process.env.NODE_ENV !== 'development',
+  });
 
   return res.send({
     refreshToken,
@@ -186,7 +191,6 @@ export async function newPassword(req: EnhancedRequest<NewPasswordInput>, res: R
 }
 
 export async function me(req: EnhancedRequest, res: Response) {
-  console.log(req.session, 189);
   let user = req.user;
   user = await user.populate('profilePicture');
   return res.send({ user: user.toJSON() });
@@ -201,8 +205,21 @@ export async function token(req: Request<unknown, unknown, NewTokenInput>, res: 
   return next(ApiError.forbidden(t('not_allowed')));
 }
 
-export async function logout(req: Request, res: Response, next: NextFunction) {
+export async function googleOauth(req: EnhancedRequest, res: Response) {
+  let user = req.user;
+
+  const refreshToken = await signRefreshToken({ sub: user._id });
+
+  user = await user.populate('profilePicture');
+
+  return res.send({
+    refreshToken,
+    user: user.toJSON(),
+    message: t('login_success'),
+  });
+}
+
+export async function logout(req: Request, res: Response) {
   req.logout();
-  req.session = null;
   return res.redirect('/');
 }

@@ -1,16 +1,17 @@
 import express from 'express';
 import compress from 'compression';
+import morgan from 'morgan';
 import routes from './routes';
 import cookieParser from 'cookie-parser';
-import cookieSession from 'cookie-session';
 import cors from 'cors';
+import cookieSession from 'cookie-session';
 import helmet from 'helmet';
 import i18n from 'i18next';
 import i18nBackend from 'i18next-fs-backend';
 import i18nMiddleware from 'i18next-http-middleware';
-import config from 'config';
 import { error } from './middleware';
 import initializedPassport from './auth';
+import { stream } from './utils';
 // import listRoutes from 'express-list-routes';
 
 i18n
@@ -25,15 +26,9 @@ i18n
 
 const app = express();
 
+app.use(morgan('dev', { stream })); // @todo LOG_FORMAT add to env and config defalt
+
 app.use(cookieParser());
-// app.use(
-//   cookieSession({
-//     name: config.get<string>('cookieName'),
-//     // sameSite: 'strict',
-//     maxAge: 24 * 60 * 60 * 1000,
-//     keys: [config.get<string>('cookieKey1')],
-//   }),
-// );
 
 app.use(express.json());
 
@@ -53,6 +48,14 @@ app.use(
 );
 
 app.use(i18nMiddleware.handle(i18n));
+
+app.use(
+  cookieSession({
+    name: 'authCookie',
+    maxAge: 24 * 60 * 60 * 1000,
+    keys: ['-'],
+  }),
+);
 
 initializedPassport(app);
 

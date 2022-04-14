@@ -1,6 +1,18 @@
 import { object, string, TypeOf } from 'zod';
 import { t } from '../utils';
 
+const fields = {
+  email: string({
+    required_error: t('email_required'),
+  }).email(t('email_invalid')),
+  password: string({
+    required_error: t('password_required'),
+  }).min(6, t('password_field_length')),
+  passwordConfirmation: string({
+    required_error: t('password_confirmation_required'),
+  }),
+};
+
 /**
  * @swagger
  * components:
@@ -31,12 +43,8 @@ import { t } from '../utils';
  */
 export const registerUserSchema = object({
   body: object({
-    password: string({
-      required_error: t('password_required'),
-    }).min(6, t('password_field_length')),
-    email: string({
-      required_error: t('email_required'),
-    }).email(t('email_invalid')),
+    email: fields.email,
+    password: fields.password,
   }),
 });
 
@@ -72,12 +80,8 @@ export const registerUserSchema = object({
  */
 export const loginSchema = object({
   body: object({
-    email: string({
-      required_error: t('email_required'),
-    }).email(t('email_invalid')),
-    password: string({
-      required_error: t('password_required'),
-    }).min(6, t('password_field_length')),
+    email: fields.email,
+    password: fields.password,
   }),
 });
 
@@ -132,9 +136,7 @@ export const verifyUserSchema = object({
  */
 export const resendVerificationCodeSchema = object({
   body: object({
-    email: string({
-      required_error: t('email_required'),
-    }).email(t('email_invalid')),
+    email: fields.email,
   }),
 });
 
@@ -165,9 +167,7 @@ export const resendVerificationCodeSchema = object({
  */
 export const forgotPasswordSchema = object({
   body: object({
-    email: string({
-      required_error: t('email_required'),
-    }).email(t('email_invalid')),
+    email: fields.email,
   }),
 });
 
@@ -204,12 +204,8 @@ export const resetPasswordSchema = object({
     passwordResetCode: string(),
   }),
   body: object({
-    password: string({
-      required_error: t('password_required'),
-    }).min(6, t('password_field_length')),
-    passwordConfirmation: string({
-      required_error: t('password_confirmation_required'),
-    }),
+    password: fields.password,
+    passwordConfirmation: fields.passwordConfirmation,
   }).refine(data => data.password === data.passwordConfirmation, {
     message: t('password_dont_match'),
     path: ['passwordConfirmation'],
@@ -246,12 +242,8 @@ export const resetPasswordSchema = object({
  */
 export const newPasswordSchema = object({
   body: object({
-    password: string({
-      required_error: t('password_required'),
-    }).min(6, t('password_field_length')),
-    passwordConfirmation: string({
-      required_error: t('password_confirmation_required'),
-    }),
+    password: fields.password,
+    passwordConfirmation: fields.passwordConfirmation,
   }).refine(data => data.password === data.passwordConfirmation, {
     message: t('password_dont_match'),
     path: ['passwordConfirmation'],

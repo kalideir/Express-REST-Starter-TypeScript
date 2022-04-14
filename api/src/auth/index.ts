@@ -17,7 +17,6 @@ const cookieExtractor = function (req) {
   if (req && req.cookies && req.cookies[cookieName]) {
     token = req.cookies[cookieName];
   }
-  console.log(req.session, 20);
   return token;
 };
 
@@ -49,7 +48,7 @@ const googleOauthHandler = async (request, accessToken, refreshToken, profile, d
   try {
     const user = await findUser({ email: profile.email });
     if (!user) {
-      return done(null, false, { message: t('account_not_found') });
+      return done(null, false, { message: t('no_associated_account_was_found') });
     }
     return done(null, user);
   } catch (error) {
@@ -61,7 +60,7 @@ export enum StrategyTypes {
   Jwt = 'jwt',
   StaffJwt = 'staffJwt',
   AdminJwt = 'adminJwt',
-  GoogleOauth = 'googleOauth',
+  GoogleOauth = 'google',
 }
 
 export default function (app: Application) {
@@ -78,5 +77,5 @@ export default function (app: Application) {
   });
 
   app.use(passport.initialize());
-  // app.use(passport.session());
+  app.use(passport.session());
 }

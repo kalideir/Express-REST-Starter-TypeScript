@@ -16,7 +16,6 @@ const userPayload = {
       required_error: 'Phone number is required',
     }).optional(),
     profilePictureId: string({}).nullable().optional(),
-    resumeId: string({}).nullable().optional(),
     endDate: string({
       required_error: 'End date is required',
     }).optional(),

@@ -2,6 +2,8 @@ import { NextFunction, Request, Response } from 'express';
 import passport from 'passport';
 import { StrategyTypes } from '../auth';
 import { ApiError } from '../errors';
+import { signAccessToken } from '../services';
+import config from 'config';
 import { t } from '../utils';
 
 const handler = (req, res, next) => async (err, user, info) => {
@@ -9,7 +11,10 @@ const handler = (req, res, next) => async (err, user, info) => {
   if (err) {
     return next(ApiError.internalServerError(error.message || t('something_went_wrong')));
   }
-  if (!user || !user.active) {
+  if (!user) {
+    return next(ApiError.unauthorized(error.message || t('unauthorized')));
+  }
+  if (!user.active) {
     return next(ApiError.unauthorized(t('unauthorized')));
   }
   if (!user.verified) {
@@ -40,9 +45,20 @@ export const googleRedirect = (req: Request, res: Response, next: NextFunction) 
   passport.authenticate(
     StrategyTypes.GoogleOauth,
     {
-      // failureRedirect: '/',
-      // successRedirect: '/',
+      successRedirect: '/',
       session: true,
     },
     handler(req, res, next),
   )(req, res, next);
+
+export function setCookie(req, res, next) {
+  const accessToken = signAccessToken({ sub: req.user._id });
+  const cookieName = config.get<string>('cookieName');
+  res.cookie(cookieName, accessToken, {
+    httpOnly: true,
+    sameSite: 'strict',
+    path: '/',
+    secure: process.env.NODE_ENV !== 'development',
+  });
+  next();
+}

@@ -5,6 +5,7 @@
     "login_invalid": "Login is invalid",
     "no_auth": "Authentication required",
     "account_not_verified": "Please verify your account",
+    "no_associated_account_was_found": "No associated account was found",
     "login_success": "Login successfull",
     "account_already_verified": "Account is already verified",
     "verification_code_was_sent": "Verification code was sent to your email",

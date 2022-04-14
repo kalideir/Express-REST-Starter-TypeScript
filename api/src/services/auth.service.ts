@@ -36,7 +36,7 @@ export function signAccessToken(payload: AccessTokenJWTPayload) {
 
 export function getCookie(accessToken: string) {
   const cookieName = config.get<string>('cookieName');
-  return `${cookieName}=${accessToken}; HttpOnly; Max-Age=${expiresIn};`;
+  return `${cookieName}=${accessToken}; HttpOnly; Path=http://localhost:8000/; Max-Age=${expiresIn};`;
 }
 
 export function generatePasswordResetCode(email: string) {

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import * as controller from '../controllers/auth.controller';
-import { authorizeUser, googleAuthorize, googleRedirect, validate } from '../middleware';
+import { authorizeUser, googleAuthorize, googleRedirect, setCookie, validate } from '../middleware';
 import {
   forgotPasswordSchema,
   loginSchema,
@@ -271,10 +271,7 @@ router.post('/token', validate(tokenSchema), use(controller.token));
 
 router.get('/google', googleAuthorize);
 
-router.get('/google/callback', googleRedirect, (req, res, next) => {
-  console.log(req.user, req.isAuthenticated(), 270);
-  return res.redirect('/');
-});
+router.get('/google/callback', googleRedirect, setCookie, use(controller.googleOauth));
 
 router.get('/logout', use(controller.logout));
 

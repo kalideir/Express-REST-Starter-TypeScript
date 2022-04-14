@@ -23,7 +23,7 @@ const debugTransport = new winstonDaily({
   filename: `%DATE%.log`,
   maxFiles: 10, // 10 Days saved
   json: false,
-  zippedArchive: true,
+  // zippedArchive: true,
   symlinkName: 'debug.log',
   createSymlink: true,
 });
@@ -36,7 +36,7 @@ const errorTransport = new winstonDaily({
   maxFiles: 30, // 30 Days saved
   handleExceptions: true,
   json: false,
-  zippedArchive: true,
+  // zippedArchive: true,
   symlinkName: 'error.log',
   createSymlink: true,
 });
@@ -63,5 +63,11 @@ logger.add(
     format: winston.format.combine(winston.format.splat(), winston.format.colorize()),
   }),
 );
+
+export const stream = {
+  write: (message: string) => {
+    logger.info(message.substring(0, message.lastIndexOf('\n')));
+  },
+};
 
 export default logger;

@@ -20,18 +20,18 @@ const smtp = config.get<{
   secure: boolean;
 }>('email');
 
-const transporter = nodemailer.createTransport({
-  ...smtp,
-  auth: { user: smtp.user, pass: smtp.pass },
-});
+// const transporter = nodemailer.createTransport({
+//   ...smtp,
+//   auth: { user: smtp.user, pass: smtp.pass },
+// });
 
-transporter.verify(function (error) {
-  if (error) {
-    logger.error(error);
-  } else {
-    logger.info('SMTP server is ready to send messages');
-  }
-});
+// transporter.verify(function (error) {
+//   if (error) {
+//     logger.error(error);
+//   } else {
+//     logger.info('SMTP server is ready to send messages');
+//   }
+// });
 
 /**
  *    from: '"*** <***gmail.com>',
@@ -51,7 +51,7 @@ async function sendEmail(options: SendMailOptions, context: SendEmailContext) {
     extName: '.hbs',
   };
 
-  transporter.use('compile', hbs(handlebarOptions));
+  // transporter.use('compile', hbs(handlebarOptions));
 
   const payload = {
     ...options,
@@ -59,14 +59,14 @@ async function sendEmail(options: SendMailOptions, context: SendEmailContext) {
     template: 'email',
     context,
   };
-  transporter.sendMail(payload, (err, info) => {
-    if (err) {
-      logger.error(err);
-      return;
-    }
+  // transporter.sendMail(payload, (err, info) => {
+  //   if (err) {
+  //     logger.error(err);
+  //     return;
+  //   }
 
-    logger.info(`Preview URL: ${nodemailer.getTestMessageUrl(info)}`);
-  });
+  //   logger.info(`Preview URL: ${nodemailer.getTestMessageUrl(info)}`);
+  // });
 }
 
 export default sendEmail;
