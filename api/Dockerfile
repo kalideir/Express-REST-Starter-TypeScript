@@ -1,31 +1,37 @@
-FROM node:16.14-slim as prod
+FROM node:16.14-slim as base
 
 # set our node environment, either development or production
 # defaults to production, compose overrides this to development on build and run
-ARG NODE_ENV=production
+ARG NODE_ENV=development
 ENV NODE_ENV $NODE_ENV
-
-ARG PORT=8000
-ENV PORT $PORT
-EXPOSE $PORT 9229 9230
 
 RUN npm i npm@latest -g
 
-RUN mkdir /usr/app
+
+RUN mkdir /usr/app && chown node:node /usr/app
+
 WORKDIR /usr/app
 
-COPY package*.json ./
+EXPOSE 8000
+EXPOSE 9229
 
-RUN npm i --unsafe-perm=true  --no-optional && npm cache clean --force
+COPY --chown=node:node package*.json ./
+
+USER node
+
+RUN rm -rf node_modules/
+RUN npm cache clean --force
+
+
+RUN npm install --unsafe-perm=true  && npm cache clean --force
+RUN npm install sharp
 
 
 ENV PATH /usr/app/node_modules/.bin:$PATH
 
-# RUN npm run build
 
-# HEALTHCHECK --interval=30s CMD node healthcheck.js
+COPY --chown=node:node . .
 
-COPY . .
 
 
 # USER node
@@ -37,12 +43,10 @@ COPY . .
 # I still can't come up with a good production way to run with npm and graceful shutdown
 # CMD [ "node", "./bin/www" ]
 
-FROM prod as dev
+FROM base as dev
 
 ENV NODE_ENV = development
 
-
-RUN npm install 
 
 
 ENTRYPOINT [ "npm", "run", "dev" ]

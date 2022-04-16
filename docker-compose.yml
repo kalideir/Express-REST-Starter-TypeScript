@@ -13,10 +13,14 @@ services:
   server:
     build:
       context: ./api/
-      target: prod
+      target: dev
       args:
         - NODE_ENV=development
         - PORT=8000
+    
+    env_file:
+      - ./api/.env.development.local
+    
     ports:
       - "8000:8000"
       - "9229:9229"
@@ -25,13 +29,7 @@ services:
       - ./api/:/usr/app
       - ./api/package.json:/usr/app/package.json
       - ./api/package-lock.json:/usr/app/package-lock.json
-    environment:
-      - NODE_ENV=development
-      - USERNAME=${MONGO_USERNAME}
-      - MONGO_PASSWORD=${MONGO_PASSWORD}
-      - MONGO_HOSTNAME=mongo
-      - MONGO_PORT=27017
-      - MONGO_DATABASE_NAME=${MONGO_DATABASE_NAME}
+      - /usr/app/node_modules
     
     restart: 'unless-stopped'
     depends_on:
@@ -47,11 +45,15 @@ services:
     image: mongo:4.4
     command: mongod --serviceExecutor adaptive
     ports:
-      - 27017:27017
+      - 27018:27017
+    
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
-      MONGO_INITDB_DATABASE: ${MONGO_DATABASE_NAME}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE}
+      - MONGO_USERNAME=${MONGO_USERNAME}
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
+
     volumes:
       - ./scripts/mongo-init.sh:/docker-entrypoint-initdb.d/mongo-init.sh/:ro
     healthcheck:

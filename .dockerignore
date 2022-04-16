@@ -1,11 +1,18 @@
-.git
-*Dockerfile*
-*docker-compose*
-node_modules
-npm-debug.log
-README.md
-.dockerignore
-.git
-.gitignore
-.prettierrc
+# compiled output
+*/.vscode
 **/node_modules
+
+# code formatter
+*/.eslintrc.json
+*/.eslintignore
+.editorconfig
+.huskyrc
+.lintstagedrc.json
+*/.prettierrc.json
+
+# test
+jest.config.js
+
+# docker
+*/Dockerfile
+docker-compose.yml

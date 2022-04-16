@@ -1,14 +1,16 @@
-set -e
+#!/bin/bash
 
 mongo <<EOF
-use $MONGO_INITDB_DATABASE
+use admin 
+db.createUser(
+  {
+    user: "${MONGO_USERNAME}",
+    pwd: "${MONGO_PASSWORD}",
+    roles: [ { role: "userAdminAnyDatabase", db: "admin" }, "readWriteAnyDatabase" ]
+  }
+)
 
-db.createUser({
-  user: '$MONGO_INITDB_USER',
-  pwd: '$MONGO_INITDB_PWD',
-  roles: [{
-    role: 'readWrite',
-    db: '$MONGO_INITDB_DATABASE'
-  }]
-})
+use "${MONGO_INITDB_DATABASE}"
+db.createCollection("users")
+db.users.insert({"name": "user"})
 EOF

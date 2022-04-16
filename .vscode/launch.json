@@ -8,10 +8,12 @@
             "name": "Attach",
             "port": 9229,
             "request": "attach",
+            "sourceMaps": true,
+            "restart": true,
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "type": "pwa-node"
+            "type": "pwa-node",
         }
        
     ]

@@ -24,6 +24,8 @@ import {
 import { EnhancedRequest } from '../types';
 import { logger, t } from '../utils';
 
+const cookieName = config.get<string>('cookieName');
+
 export async function register(req: Request<RegisterUserInput>, res: Response, next: NextFunction) {
   const input = req.body;
   const exists = await findUserByEmail(input.email);
@@ -64,8 +66,6 @@ export async function login(req: Request<LoginInput>, res: Response, next: NextF
   const refreshToken = await signRefreshToken({ sub: user._id });
 
   user = await user.populate('profilePicture');
-
-  const cookieName = config.get<string>('cookieName');
 
   res.cookie(cookieName, accessToken, {
     httpOnly: true,
@@ -199,10 +199,18 @@ export async function me(req: EnhancedRequest, res: Response) {
 
 export async function token(req: Request<unknown, unknown, NewTokenInput>, res: Response, next: NextFunction) {
   const { refreshToken } = req.body;
+
   const newAccessToken = await reIssueAccessToken({ refreshToken });
+
   if (newAccessToken) {
-    return res.send({ token: newAccessToken });
+    res.cookie(cookieName, newAccessToken, {
+      httpOnly: true,
+      sameSite: 'strict',
+      path: '/',
+      secure: process.env.NODE_ENV !== 'development',
+    });
   }
+
   return next(ApiError.forbidden(t('not_allowed')));
 }
 

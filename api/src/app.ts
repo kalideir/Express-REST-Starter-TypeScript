@@ -27,7 +27,7 @@ i18n
 
 const app = express();
 
-app.use(morgan('dev', { stream })); // @todo LOG_FORMAT add to env and config defalt
+app.use(morgan('prod', { stream })); // @todo LOG_FORMAT add to env and config defalt
 
 app.use(cookieParser());
 
