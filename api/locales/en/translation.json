@@ -38,9 +38,4 @@
     "last_name_required": "Last name is required",
     "address_required": "Address is required",
     "phone_number_required": "Phone number is required",
-    "space_title_required": "Space title is required",
-    "participant_id_required": "Participant id is required",
-    "participant_type_required": "Participant type is required",
-    "participant_type_invalid": "Participant type is missing",
-    "create_space_success": "Space has been created successfully "
   }
